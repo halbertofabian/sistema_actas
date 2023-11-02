@@ -1,7 +1,8 @@
 <?php
 
 
-
+include_once './config.php';
+require_once './modelo.php';
 class Controlador
 {
     public  function cargarArchivo()
@@ -152,11 +153,190 @@ class Controlador
             "NE" => "Nacido en el extranjero"
         );
     }
+
+    public static function generarActa()
+    {
+        // Configura la solicitud HTTP POST
+        $options = array(
+            'http' => array(
+                'method'  => 'POST',
+                'header'  => 'Content-type: application/x-www-form-urlencoded',
+                'content' => http_build_query(array('ruta' => $_POST['ruta'])),
+            ),
+        );
+        $context = stream_context_create($options); // Crea un contexto de flujo
+
+        // Realiza la solicitud HTTP POST al archivo de destino
+        $resultado = file_get_contents(HTTP_HOST . 'combinacion/guardar.php', false, $context);
+        $result = json_decode($resultado, true);
+        if ($result['status']) {
+            $respuesta = Controlador::combinarActa($_POST['ruta']);
+            $result2 = json_decode($respuesta, true);
+            if ($result2['status']) {
+                if (!isset($_POST['sinReverso'])) {
+                    $rvs = Modelo::mdlMostrarReversoByClave($_POST['clave_estado']);
+                    $rvs_ruta = $rvs['rvs_ruta'];
+                    if(!$rvs_ruta){
+                        unlink($_POST['ruta']);
+                        return json_encode(array(
+                            'status' => false,
+                            'mensaje' => 'El reverso aun no se agrega al sistema, por favor agreguelo o seleccione sin reverso.',
+                        ), true);
+                    }
+                    $respuesta2 = Controlador::generarActaCompleta($_POST['ruta'], $rvs_ruta);
+                    $result3 = json_decode($respuesta2, true);
+                    if ($result3['status']) {
+                        $upload_result = Controlador::guardarActas($_POST['ruta']);
+                        return $upload_result;
+                    } else {
+                        return $respuesta2;
+                    }
+                } else {
+                    $upload_result = Controlador::guardarActas($_POST['ruta']);
+                    return $upload_result;
+                }
+            } else {
+                return $respuesta;
+            }
+        } else {
+            // Error en la combinación de archivos
+            return $resultado;
+        }
+    }
+    public static function combinarActa($ruta)
+    {
+        // Configura la solicitud HTTP POST
+        $options = array(
+            'http' => array(
+                'method'  => 'POST',
+                'header'  => 'Content-type: application/x-www-form-urlencoded',
+                'content' => http_build_query(array('ruta' => $ruta)),
+            ),
+        );
+        $context = stream_context_create($options); // Crea un contexto de flujo
+
+        // Realiza la solicitud HTTP POST al archivo de destino
+        $resultado = file_get_contents(HTTP_HOST . 'unir/unir.php', false, $context);
+        return $resultado;
+    }
+    public static function generarActaCompleta($ruta, $rvs_ruta)
+    {
+        // Configura la solicitud HTTP POST
+        $options = array(
+            'http' => array(
+                'method'  => 'POST',
+                'header'  => 'Content-type: application/x-www-form-urlencoded',
+                'content' => http_build_query(array('ruta' => $ruta, 'rvs_ruta' => $rvs_ruta)),
+            ),
+        );
+        $context = stream_context_create($options); // Crea un contexto de flujo
+
+        // Realiza la solicitud HTTP POST al archivo de destino
+        $resultado = file_get_contents(HTTP_HOST . 'combinacion/generar.php', false, $context);
+        return $resultado;
+    }
+
+    public static function guardarReversos()
+    {
+        if (isset($_FILES["rvs_ruta"])) {
+            $inputName = "rvs_ruta";
+            $upload_result = subirArchivoReverso($inputName);
+            if (is_array($upload_result) && isset($upload_result['status']) && $upload_result['status'] === false) {
+                return $upload_result;
+            } else {
+                $url_file = $upload_result;
+            }
+        }
+
+        $archivoGuardado = Modelo::mdlBuscarReversoByRuta($url_file);
+        if ($archivoGuardado) {
+            return array(
+                'mensaje' => 'El archivo ya fue guardado en el servidor.',
+            );
+        } else {
+            $datos = array(
+                'rvs_clave' => $_POST['rvs_clave'],
+                'rvs_ruta' => $url_file,
+            );
+            $archivo = Modelo::mdlAgregarReversos($datos);
+            if ($archivo) {
+                return array(
+                    'status' => true,
+                    'mensaje' => 'El reverso se a agregado con éxito',
+                );
+            } else {
+                return array(
+                    'status' => false,
+                    'mensaje' => 'Hubo un error.',
+                );
+            }
+        }
+    }
+
+    public static function guardarActas($ruta)
+    {
+        // Ruta donde se guardará la imagen en el servidor
+        $directorioDestino = DOCUMENT_ROOT . "actas_realizadas/";
+        $url_file = HTTP_HOST . "actas_realizadas/";
+
+        if (!file_exists($directorioDestino)) {
+            mkdir($directorioDestino, 0777, true);
+        }
+
+
+        // Generar un nombre único para el archivo
+        $nombreArchivo = basename($ruta);
+        // Ruta completa del archivo de destino
+        $rutaDestino = $directorioDestino . $nombreArchivo;
+        $url_file = $url_file . $nombreArchivo;
+
+        // Mover el archivo subido al directorio de destino
+        if (copy($ruta, $rutaDestino)) {
+            if (file_exists($ruta)) {
+                unlink($ruta);
+            }
+            $archivoGuardado = Modelo::mdlBuscarActaByRuta($url_file);
+            if ($archivoGuardado) {
+                return json_encode(array(
+                    'mensaje' => 'El archivo ya fue guardado en el servidor.',
+                ), true);
+            } else {
+                $datos = array(
+                    'ar_curp' => pathinfo($nombreArchivo, PATHINFO_FILENAME),
+                    'ar_ruta' => $url_file,
+                );
+                $archivo = Modelo::mdlAgregarActaCompletada($datos);
+                if ($archivo) {
+
+                    return json_encode(array(
+                        'status' => true,
+                        'mensaje' => 'La acta se a agregado con éxito',
+                        'ruta_acta' => $url_file,
+                    ), true);
+                } else {
+                    return json_encode(array(
+                        'status' => false,
+                        'mensaje' => 'Hubo un error.',
+                    ), true);
+                }
+            }
+        }
+    }
 }
+
+
 
 if (isset($_POST['cargarArchivo'])) {
     $cargarArvhivo = new Controlador();
     echo json_encode($cargarArvhivo->cargarArchivo(), true);
+}
+if (isset($_POST['btnGenerarActa'])) {
+    $generarActa = new Controlador();
+    echo $generarActa->generarActa();
+}
+if (isset($_POST['btnGuardarReversos'])) {
+    $guardarReversos = new Controlador();
+    echo json_encode($guardarReversos->guardarReversos(), true);
 }
 
 

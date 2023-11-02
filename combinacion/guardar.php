@@ -9,36 +9,44 @@ Método 3: Escribir en archivo
  */
 # Cargar librerías
 require_once "vendor/autoload.php";
+include_once '../config.php';
 
 use iio\libmergepdf\Merger;
-# Ruta de los documentos
-$documentos = [ "../actas_realizadas/base.pdf","../temp_file/GAVL670825HGRRZS00_N.pdf", "../reversos_file/GUERRERO REVERSO (2) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1).pdf"];
 
-# Crear el "combinador"
-$combinador = new Merger;
+if (isset($_POST['ruta'])) {
+    if (!file_exists($_POST['ruta'])) {
+        echo json_encode(array('status' => false, 'mensaje' => 'Error al realizar la combinación de archivos'));
+        exit;
+    }
+    # Ruta de los documentos
+    $documentos = ["../actas_realizadas/base.pdf", $_POST['ruta']];
 
-# Agregar archivo en cada iteración
-foreach ($documentos as $documento) {
-    $combinador->addFile($documento);
-}
+    # Crear el "combinador"
+    $combinador = new Merger;
 
-# Y combinar o unir
-$salida = $combinador->merge();
+    # Agregar archivo en cada iteración
+    foreach ($documentos as $documento) {
+        $combinador->addFile($documento);
+    }
 
-/*
+    # Y combinar o unir
+    $salida = $combinador->merge();
+
+    /*
 Ahora la salida la mostramos directamente en la petición,
 y enviamos unos encabezados para que el navegador
 lo interprete
  */
-# Este nombre se pondrá como título o nombre del documento
-$nombreArchivo = "../temp_file/GAVL670825HGRRZS00_N.pdf";
+    # Este nombre se pondrá como título o nombre del documento
+    $nombreArchivo = $_POST['ruta'];
 
-# Escribir salida en el nombre del archivo
-# Recomiendo: https://parzibyte.me/blog/2018/07/10/trabajando-con-archivos-y-carpetas-en-php-crud/
-$bytesEscritos = file_put_contents($nombreArchivo, $salida);
+    # Escribir salida en el nombre del archivo
+    # Recomiendo: https://parzibyte.me/blog/2018/07/10/trabajando-con-archivos-y-carpetas-en-php-crud/
+    $bytesEscritos = file_put_contents($nombreArchivo, $salida);
 
-if ($bytesEscritos !== false) {
-    echo "Correcto. Se escribieron $bytesEscritos bytes en $nombreArchivo";
-} else {
-    echo "Error escribiendo archivo";
+    if ($bytesEscritos !== false) {
+        echo json_encode(array('status' => true, 'mensaje' => 'La combinación se realizó con éxito'));
+    } else {
+        echo json_encode(array('status' => false, 'mensaje' => 'Error al realizar la combinación de archivos'));
+    }
 }
