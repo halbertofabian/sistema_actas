@@ -253,6 +253,9 @@ require_once 'controlador.php';
                         }).then(function() {
                             $('#formGenerarActa')[0].reset();
                             $("#fileToUpload").val("")
+                            $(".mensajeCarga").removeClass('alert-success');
+                            $(".mensajeCarga").removeClass('alert-danger');
+                            $("#msj_respuesta").html("");
                             $('.iframe_acta').attr('src', res.ruta_acta);
                         });
                     } else {

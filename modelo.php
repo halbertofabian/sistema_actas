@@ -75,7 +75,7 @@ class Modelo{
     {
         try {
             //code...
-            $sql = "SELECT * FROM tbl_actas_realizadas_ar WHERE ar_ruta = ?";
+            $sql = "SELECT * FROM tbl_actas_realizadas_ar WHERE ar_ruta = ? AND ar_status = 1";
             $con = Conexion::conectar();
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $ruta);
