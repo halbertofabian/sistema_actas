@@ -108,6 +108,16 @@ class Controlador
         }
     }
 
+    public static function obtenerEstadoDeClave($clave, $estados)
+    {
+        // Buscamos el estado en el arreglo
+        if (isset($estados[$clave])) {
+            return $estados[$clave];
+        } else {
+            return "Clave de estado no reconocida";
+        }
+    }
+
     public static function obtenerCalveEstadoDeCurp($curp)
     {
         $curpExtraida = substr($curp, 0, 18);
@@ -339,6 +349,23 @@ class Controlador
             return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el acta.');
         }
     }
+    public static function eliminarReverso()
+    {
+        $rvs = Modelo::mdlBuscarReversosById($_POST['rvs_id']);
+        $archivo = $rvs['rvs_ruta'];
+
+
+        // Verificar si el archivo existe antes de intentar eliminarlo
+        if (file_exists($archivo)) {
+            unlink($archivo);
+        }
+        $res = Modelo::mdlEliminarReversoCompletado($rvs['rvs_id']);
+        if ($res) {
+            return array('status' => true, 'mensaje' => 'El reverso se elimino correctamente.');
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el reverso.');
+        }
+    }
     public static function mostrarActas()
     {
         $dt_actas = array();
@@ -360,6 +387,29 @@ class Controlador
 
         return $dt_actas;
     }
+
+    public static function mostrarReversos()
+    {
+        $dt_actas = array();
+        $categorias = Modelo::mdlMostrarReversos();
+        foreach ($categorias as $key => $rvs) {
+            $dt_aux = array(
+                'rvs_id' => $rvs['rvs_id'],
+                'rvs_estado' => Controlador::obtenerEstadoDeClave($rvs['rvs_clave'], Controlador::obtenerClavesEstados()),
+                'rvs_acciones' => '
+                <div class="btn-group" role="group" aria-label="">
+                    <a type="button" class="btn btn-light" href="' . HTTP_HOST . 'reversos_file/' . basename($rvs['rvs_ruta']) . '" target="_blank"><i class="fas fa-eye"></i></a>
+                    <button type="button" class="btn btn-danger btnEliminarReverso" rvs_id="' . $rvs['rvs_id'] . '"><i class="fa fa-trash-alt"></i></button>
+                </div>
+                ',
+            );
+
+            array_push($dt_actas, $dt_aux);
+        }
+
+        return $dt_actas;
+    }
+    
 }
 
 
@@ -380,9 +430,17 @@ if (isset($_POST['btnEliminarActa'])) {
     $eliminarActa = new Controlador();
     echo json_encode($eliminarActa->eliminarActa(), true);
 }
+if (isset($_POST['btnEliminarReverso'])) {
+    $eliminarReverso = new Controlador();
+    echo json_encode($eliminarReverso->eliminarReverso(), true);
+}
 if (isset($_POST['btnMostrarActas'])) {
     $mostrarActas = new Controlador();
     echo json_encode($mostrarActas->mostrarActas(), true);
+}
+if (isset($_POST['btnMostrarReversos'])) {
+    $mostrarReversos = new Controlador();
+    echo json_encode($mostrarReversos->mostrarReversos(), true);
 }
 
 

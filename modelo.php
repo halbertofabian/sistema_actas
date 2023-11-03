@@ -1,6 +1,7 @@
 <?php
 require_once DOCUMENT_ROOT . "conexion.php";
-class Modelo{
+class Modelo
+{
     public static function mdlAgregarReversos($rvs)
     {
         try {
@@ -23,7 +24,7 @@ class Modelo{
     {
         try {
             //code...
-            $sql = "SELECT * FROM tbl_reversos_rvs WHERE rvs_ruta = ?";
+            $sql = "SELECT * FROM tbl_reversos_rvs WHERE rvs_ruta = ? AND rvs_status = 1";
             $con = Conexion::conectar();
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $ruta);
@@ -105,6 +106,23 @@ class Modelo{
             $con = null;
         }
     }
+    public static function mdlBuscarReversosById($rvs_id)
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_reversos_rvs WHERE rvs_id = ? AND rvs_status = 1";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $rvs_id);
+            $pps->execute();
+            return $pps->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
     public static function mdlMostrarActas()
     {
         try {
@@ -121,6 +139,23 @@ class Modelo{
             $con = null;
         }
     }
+    public static function mdlMostrarReversos()
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_reversos_rvs WHERE rvs_status = 1 ORDER BY rvs_id DESC ";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->execute();
+            return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
     public static function mdlEliminarActaCompletada($ar_id)
     {
         try {
@@ -129,6 +164,24 @@ class Modelo{
             $con = Conexion::conectar();
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $ar_id);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
+    public static function mdlEliminarReversoCompletado($rvs_id)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_reversos_rvs SET rvs_status = 0 WHERE rvs_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $rvs_id);
             $pps->execute();
             return $pps->rowCount() > 0;
         } catch (PDOException $th) {
