@@ -176,7 +176,7 @@ class Controlador
                 if (!isset($_POST['sinReverso'])) {
                     $rvs = Modelo::mdlMostrarReversoByClave($_POST['clave_estado']);
                     $rvs_ruta = $rvs['rvs_ruta'];
-                    if(!$rvs_ruta){
+                    if (!$rvs_ruta) {
                         unlink($_POST['ruta']);
                         return json_encode(array(
                             'status' => false,
@@ -322,6 +322,44 @@ class Controlador
             }
         }
     }
+    public static function eliminarActa()
+    {
+        $ar = Modelo::mdlBuscarActaById($_POST['ar_id']);
+        $archivo = basename($ar['ar_ruta']);
+        $imagen = DOCUMENT_ROOT . "actas_realizadas/" . $archivo;
+
+        // Verificar si el archivo existe antes de intentar eliminarlo
+        if (file_exists($imagen)) {
+            unlink($imagen);
+        }
+        $res = Modelo::mdlEliminarActaCompletada($ar['ar_id']);
+        if ($res) {
+            return array('status' => true, 'mensaje' => 'La acta se elimino correctamente.');
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el acta.');
+        }
+    }
+    public static function mostrarActas()
+    {
+        $dt_actas = array();
+        $categorias = Modelo::mdlMostrarActas();
+        foreach ($categorias as $key => $ar) {
+            $dt_aux = array(
+                'ar_id' => $ar['ar_id'],
+                'ar_curp' => $ar['ar_curp'],
+                'ar_acciones' => '
+                <div class="btn-group" role="group" aria-label="">
+                    <a type="button" class="btn btn-light" href="' . $ar['ar_ruta'] . '" target="_blank"><i class="fas fa-eye"></i></a>
+                    <button type="button" class="btn btn-danger btnEliminarActa" ar_id="' . $ar['ar_id'] . '"><i class="fa fa-trash-alt"></i></button>
+                </div>
+                ',
+            );
+
+            array_push($dt_actas, $dt_aux);
+        }
+
+        return $dt_actas;
+    }
 }
 
 
@@ -337,6 +375,14 @@ if (isset($_POST['btnGenerarActa'])) {
 if (isset($_POST['btnGuardarReversos'])) {
     $guardarReversos = new Controlador();
     echo json_encode($guardarReversos->guardarReversos(), true);
+}
+if (isset($_POST['btnEliminarActa'])) {
+    $eliminarActa = new Controlador();
+    echo json_encode($eliminarActa->eliminarActa(), true);
+}
+if (isset($_POST['btnMostrarActas'])) {
+    $mostrarActas = new Controlador();
+    echo json_encode($mostrarActas->mostrarActas(), true);
 }
 
 

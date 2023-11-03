@@ -13,7 +13,13 @@ require_once 'controlador.php';
     <!-- Bootstrap CSS -->
     <link href="<?= HTTP_HOST ?>app-assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= HTTP_HOST ?>app-assets/css/fontawesome.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/v/bs5/dt-1.13.6/af-2.6.0/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.css" rel="stylesheet">
+
+
     <script src="<?= HTTP_HOST ?>app-assets/js/jquery.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-1.13.6/af-2.6.0/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.js"></script>
+
+
     <script src="<?= HTTP_HOST ?>app-assets/js/sweetalert.js"></script>
 
     <title>Sistema para generar actas</title>
@@ -95,31 +101,14 @@ require_once 'controlador.php';
                             <div class="tab-pane fade" id="nav-2" role="tabpanel" aria-labelledby="nav-2-tab">
                                 <div class="row">
                                     <div class="col-12">
-                                        <table class="table table-striped table-hover text-center">
-                                            <thead>
+                                        <table class="table table-hover" id="data_table_actas" style="width: 100%;">
+                                            <thead class="table-dark text-center">
                                                 <tr>
                                                     <th>#</th>
                                                     <th>CURP</th>
                                                     <th>ACCIONES</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <?php
-                                                $actas = Modelo::mdlMostrarActas();
-                                                foreach ($actas as $ar) :
-                                                ?>
-                                                    <tr>
-                                                        <td><?= $ar['ar_id'] ?></td>
-                                                        <td><?= $ar['ar_curp'] ?></td>
-                                                        <td>
-                                                            <div class="btn-group" role="group" aria-label="">
-                                                                <a type="button" class="btn btn-light" href="<?= $ar['ar_ruta'] ?>" target="_blank"><i class="fas fa-eye"></i></a>
-                                                                <button type="button" class="btn btn-danger"><i class="fa fa-trash-alt"></i></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -187,6 +176,7 @@ require_once 'controlador.php';
 
     <script>
         $(document).ready(function() {
+            mostrarActas();
 
             $("#fileToUpload").on("change", function() {
                 $("#formUpload").submit(); // Envía el formulario cuando se selecciona un archivo
@@ -257,6 +247,7 @@ require_once 'controlador.php';
                             $(".mensajeCarga").removeClass('alert-danger');
                             $("#msj_respuesta").html("");
                             $('.iframe_acta').attr('src', res.ruta_acta);
+                            mostrarActas();
                         });
                     } else {
                         swal({
@@ -308,6 +299,72 @@ require_once 'controlador.php';
             }
 
         });
+
+        $(document).on('click', '.btnEliminarActa', function() {
+            var ar_id = $(this).attr('ar_id');
+            swal({
+                title: '¿Esta seguro de eliminar el acta?',
+                text: 'Esta accion no es reversible',
+                icon: 'warning',
+                buttons: ['No', 'Si, eliminar acta'],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    var datos = new FormData()
+                    datos.append('ar_id', ar_id);
+                    datos.append('btnEliminarActa', true);
+                    $.ajax({
+                        type: 'POST',
+                        url: 'controlador.php',
+                        data: datos,
+                        dataType: 'json',
+                        processData: false,
+                        contentType: false,
+                        success: function(res) {
+                            if (res) {
+                                swal({
+                                    title: '¡Bien!',
+                                    text: res.mensaje,
+                                    type: 'success',
+                                    icon: 'success'
+                                }).then(function() {
+                                    mostrarActas();
+                                });
+                            } else {
+                                swal('Oops', res.mensaje, 'error');
+                            }
+                        }
+                    });
+                } else {}
+            });
+        });
+
+        function mostrarActas() {
+            data_table_actas = $('#data_table_actas').DataTable({
+                responsive: true,
+                'ajax': {
+                    'url': 'controlador.php',
+                    'method': 'POST', //usamos el metodo POST
+                    'data': {
+                        btnMostrarActas: true,
+                    }, //enviamos opcion 4 para que haga un SELECT
+                    'dataSrc': ''
+                },
+                'bDestroy': true,
+                order: false,
+                'columns': [{
+                        'data': 'ar_id',
+
+                    },
+                    {
+                        'data': 'ar_curp'
+                    },
+                    {
+                        'data': 'ar_acciones'
+                    },
+                ]
+            });
+        }
     </script>
 </body>
 

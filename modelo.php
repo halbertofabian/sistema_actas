@@ -88,6 +88,23 @@ class Modelo{
             $con = null;
         }
     }
+    public static function mdlBuscarActaById($ar_id)
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_actas_realizadas_ar WHERE ar_id = ? AND ar_status = 1";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $ar_id);
+            $pps->execute();
+            return $pps->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
     public static function mdlMostrarActas()
     {
         try {
@@ -97,6 +114,23 @@ class Modelo{
             $pps = $con->prepare($sql);
             $pps->execute();
             return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlEliminarActaCompletada($ar_id)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_actas_realizadas_ar SET ar_status = 0 WHERE ar_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $ar_id);
+            $pps->execute();
+            return $pps->rowCount() > 0;
         } catch (PDOException $th) {
             //throw $th;
         } finally {
