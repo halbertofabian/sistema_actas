@@ -1,6 +1,4 @@
 <?php
-
-
 include_once './config.php';
 require_once './modelo.php';
 class Controlador
@@ -409,7 +407,77 @@ class Controlador
 
         return $dt_actas;
     }
-    
+    public static function mostrarUsuarios()
+    {
+        $dt_usuarios = array();
+        $usuarios = Modelo::mdlMostrarUsuarios();
+        foreach ($usuarios as $key => $usr) {
+            $dt_aux = array(
+                'usr_id' => $usr['usr_id'],
+                'usr_correo' => $usr['usr_correo'],
+                'usr_acciones' => '
+                <div class="btn-group" role="group" aria-label="">
+                    <button type="button" class="btn btn-warning btnEditarUsuario" usr_id="' . $usr['usr_id'] . '" usr_correo="' . $usr['usr_correo'] . '"><i class="fas fa-edit"></i></a>
+                    <button type="button" class="btn btn-danger btnEliminarUsuario" usr_id="' . $usr['usr_id'] . '"><i class="fa fa-trash-alt"></i></button>
+                </div>
+                ',
+            );
+
+            array_push($dt_usuarios, $dt_aux);
+        }
+
+        return $dt_usuarios;
+    }
+    public static function guardarUsuarios()
+    {
+        $_POST['usr_correo'] = trim($_POST['usr_correo']);
+        $_POST['usr_contraseña'] = crypt(trim($_POST['usr_contraseña']), '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+        if ($_POST['usr_id'] == "") {
+            $usr = Modelo::mdlMostrarUsuariosByCorreo($_POST['usr_correo']);
+            if ($usr) {
+                return array('status' => false, 'mensaje' => 'El correo ' . $_POST['usr_correo'] . ' ya existe. Intente con otro diferente.');
+            }
+
+            $res = Modelo::mdlAgregarUsuario($_POST);
+            if ($res) {
+                return array('status' => true, 'mensaje' => 'El usuario se guardo correctamente.');
+            } else {
+                return array('status' => false, 'mensaje' => 'Hubo un error al guardar el usuario.');
+            }
+        } else {
+            $res = Modelo::mdlActualizarUsuario($_POST);
+            if ($res) {
+                return array('status' => true, 'mensaje' => 'El usuario se actualizo correctamente.');
+            } else {
+                return array('status' => false, 'mensaje' => 'Hubo un error al actualizar el usuario.');
+            }
+        }
+    }
+    public static function EliminarUsuarios()
+    {
+        $res = Modelo::mdlEliminarUsuario($_POST['usr_id']);
+        if ($res) {
+            return array('status' => true, 'mensaje' => 'El usuario se elimino correctamente.');
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el usuario.');
+        }
+    }
+    public static function iniciarSesion()
+    {
+        $encriptar = crypt($_POST["usr_contraseña"], '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
+        $usr = Modelo::mdlMostrarUsuariosByCorreo(trim($_POST['usr_correo']));
+        if ($usr && $encriptar == $usr["usr_contraseña"]) {
+            if ($usr["usr_estado_borrado"] == 1) {
+                $_SESSION["session"] = true;
+                $_SESSION['session_usr'] = $usr;
+                return array('status' => true, 'mensaje' => 'Bienvenido al sistema de actas.');
+            } else {
+                return array('status' => false, 'mensaje' => 'Tu usuario fue desactivado por los administradores.');
+            }
+        } else {
+            return array('status' => false, 'mensaje' => 'Correo o contraseña incorrectos. Intente de nuevo.');
+        }
+    }
 }
 
 
@@ -441,6 +509,27 @@ if (isset($_POST['btnMostrarActas'])) {
 if (isset($_POST['btnMostrarReversos'])) {
     $mostrarReversos = new Controlador();
     echo json_encode($mostrarReversos->mostrarReversos(), true);
+}
+if (isset($_POST['btnMostrarUsuarios'])) {
+    $mostrarUsuarios = new Controlador();
+    echo json_encode($mostrarUsuarios->mostrarUsuarios(), true);
+}
+if (isset($_POST['btnGuardarUsuario'])) {
+    $guardarUsuarios = new Controlador();
+    echo json_encode($guardarUsuarios->guardarUsuarios(), true);
+}
+if (isset($_POST['btnEliminarUsuario'])) {
+    $eliminarUsuarios = new Controlador();
+    echo json_encode($eliminarUsuarios->EliminarUsuarios(), true);
+}
+if (isset($_POST['btnIniciarSesion'])) {
+    $iniciarSesion = new Controlador();
+    echo json_encode($iniciarSesion->iniciarSesion(), true);
+}
+if (isset($_POST['btnCerrarSesion'])) {
+    session_destroy();
+    echo json_encode(array('status' => true));
+    exit();
 }
 
 

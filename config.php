@@ -1,4 +1,5 @@
 <?php
+@session_start();
 $folder = explode("/", $_SERVER['REQUEST_URI']);
 define('FOLDER', $folder[1]);
 
@@ -37,4 +38,10 @@ function subirArchivoReverso($inputName)
     move_uploaded_file($imagen["tmp_name"], $rutaDestino);
 
     return $rutaDestino;
+}
+
+function iniciarApp()
+{
+
+    include_once './principal.php';
 }
