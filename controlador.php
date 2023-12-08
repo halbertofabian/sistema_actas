@@ -478,6 +478,25 @@ class Controlador
             return array('status' => false, 'mensaje' => 'Correo o contraseña incorrectos. Intente de nuevo.');
         }
     }
+
+    public static function limpiar()
+    {
+        $actas = Modelo::mdlMostrarActasAll();
+        $contador = 0;
+        foreach ($actas as $key => $ar) {
+            $archivo = basename($ar['ar_ruta']);
+            $imagen = DOCUMENT_ROOT . "actas_realizadas/" . $archivo;
+
+            // Verificar si el archivo existe antes de intentar eliminarlo
+            if (file_exists($imagen)) {
+                unlink($imagen);
+            }
+            $res = Modelo::mdlEliminarActa($ar['ar_id']);
+            $contador++;
+        }
+
+        return array('mensaje' => 'Se eliminaron ' . $contador . ' actas.');
+    }
 }
 
 
