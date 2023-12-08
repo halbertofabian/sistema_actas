@@ -482,7 +482,7 @@ class Controlador
     public static function limpiar()
     {
         $actas = Modelo::mdlMostrarActasAll();
-        $contador = 0;
+        $contador_ar = 0;
         foreach ($actas as $key => $ar) {
             $archivo = basename($ar['ar_ruta']);
             $imagen = DOCUMENT_ROOT . "actas_realizadas/" . $archivo;
@@ -492,10 +492,21 @@ class Controlador
                 unlink($imagen);
             }
             $res = Modelo::mdlEliminarActa($ar['ar_id']);
-            $contador++;
+            $contador_ar++;
+        }
+        $carpeta = DOCUMENT_ROOT . "temp_file";
+        $archivos = scandir($carpeta);
+        // Elimina cada archivo
+        $contador_at = 0;
+        foreach ($archivos as $archivo) {
+            $rutaCompleta = $carpeta . '/' . $archivo;
+            if (is_file($rutaCompleta)) {
+                unlink($rutaCompleta);
+                $contador_at++;
+            }
         }
 
-        return array('mensaje' => 'Se eliminaron ' . $contador . ' actas.');
+        return array('mensaje' => 'Se eliminaron ' . $contador_ar . ' actas realizadas. Y ' . $contador_at . ' archivos temporales.');
     }
 }
 
