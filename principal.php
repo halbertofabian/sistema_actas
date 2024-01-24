@@ -224,10 +224,11 @@
                                             <form id="formNewServicios" class="row g-3">
                                                 <div class="col-12">
                                                     <label for="srv_nombre" class="form-label">Nombre del servicio</label>
+                                                    <input type="hidden" name="srv_id" id="srv_id">
                                                     <input type="text" class="form-control text-uppercase" name="srv_nombre" id="srv_nombre" placeholder="" required />
                                                 </div>
                                                 <div class="col-12">
-                                                    <button type="submit" class="btn btn-primary float-end">
+                                                    <button type="submit" id="btnGuardarSrv" class="btn btn-primary float-end">
                                                         Guardar
                                                     </button>
                                                 </div>
@@ -746,6 +747,11 @@
                 $('#formGuardarUsuario')[0].reset();
                 $("#usr_id").val("");
             });
+            $("#nav-5-tab").click(function() {
+                $("#srv_nombre").val("");
+                $("#srv_id").val("");
+                $("#btnGuardarSrv").text('Guardar');
+            });
 
             function mostrarServicios() {
                 data_table_usuarios = $('#data_table_servicios').DataTable({
@@ -793,6 +799,8 @@
                                 icon: 'success'
                             }).then(function() {
                                 $("#srv_nombre").val("");
+                                $("#srv_id").val("");
+                                $("#btnGuardarSrv").text('Guardar');
                                 mostrarServicios();
                                 mostrarServicios2();
                                 setTimeout(() => {
@@ -804,6 +812,61 @@
                         }
                     }
                 });
+            });
+
+            $(document).on('click', '.btnEditarServicio', function() {
+                var srv_id = $(this).attr('srv_id');
+                var srv_nombre = $(this).attr('srv_nombre');
+                $("#srv_id").val(srv_id);
+                $("#srv_nombre").val(srv_nombre);
+                $("#btnGuardarSrv").text('Actualizar');
+            });
+
+            $(document).on('click', '.btnEliminarServicio', function() {
+                var srv_id = $(this).attr('srv_id');
+                swal({
+                    title: '¿Esta seguro de eliminar este servicio?',
+                    text: 'Esta accion no es reversible',
+                    icon: 'warning',
+                    buttons: ['No', 'Si, eliminar'],
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        var datos = new FormData();
+                        datos.append('srv_id', srv_id);
+                        datos.append('btnEliminarServicio', true);
+                        $.ajax({
+                            type: 'POST',
+                            url: 'controlador.php',
+                            data: datos,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function(res) {
+                                if (res.status) {
+                                    swal({
+                                        title: '¡Bien!',
+                                        text: res.mensaje,
+                                        type: 'success',
+                                        icon: 'success'
+                                    }).then(function() {
+                                        mostrarServicios();
+                                        mostrarServicios2();
+                                        mostrarPaquetes();
+                                        mostrarPrecios();
+                                        setTimeout(() => {
+                                            $('#pqt_id').change();
+                                            $(".inputN").number(true, 2);
+                                        }, 500);
+                                    });
+                                }else{
+                                    swal('Oops', res.mensaje, 'error');
+                                }
+                            }
+                        });
+                    } else {}
+                });
+
             });
 
             function mostrarServicios2() {

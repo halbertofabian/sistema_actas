@@ -362,6 +362,24 @@ class Modelo
             $con = null;
         }
     }
+    public static function mdlActualizarServicio($srv)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_servicios_srv SET srv_nombre = ? WHERE srv_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $srv['srv_nombre']);
+            $pps->bindValue(2, $srv['srv_id']);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
 
     public static function mdlMostrarPaquetesByNombre($pqt_nombre)
     {
@@ -474,7 +492,7 @@ class Modelo
         }
     }
 
-    public static function mdlEliminarPrecios($prc_id_pqt)
+    public static function mdlEliminarPreciosByPaquete($prc_id_pqt)
     {
         try {
             //code...
@@ -482,6 +500,23 @@ class Modelo
             $con = Conexion::conectar();
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $prc_id_pqt);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlEliminarPreciosByServicio($prc_id_srv)
+    {
+        try {
+            //code...
+            $sql = "DELETE FROM tbl_precios_prc WHERE prc_id_srv = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $prc_id_srv);
             $pps->execute();
             return $pps->rowCount() > 0;
         } catch (PDOException $th) {
@@ -499,6 +534,23 @@ class Modelo
             $con = Conexion::conectar();
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $pqt_id);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlEliminarServicio($srv_id)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_servicios_srv SET srv_estado_borrado = 0 WHERE srv_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $srv_id);
             $pps->execute();
             return $pps->rowCount() > 0;
         } catch (PDOException $th) {

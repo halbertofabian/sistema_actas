@@ -519,8 +519,8 @@ class Controlador
                 'srv_nombre' => $srv['srv_nombre'],
                 'srv_acciones' => '
                 <div class="btn-group" role="group" aria-label="">
-                    <button type="button" class="btn btn-warning btnEditarServicio" usr_id="' . $srv['srv_id'] . '" srv_nombre="' . $srv['srv_nombre'] . '"><i class="fas fa-edit"></i></a>
-                    <button type="button" class="btn btn-danger btnEliminarServicio" usr_id="' . $srv['srv_id'] . '"><i class="fa fa-trash-alt"></i></button>
+                    <button type="button" class="btn btn-warning btnEditarServicio" srv_id="' . $srv['srv_id'] . '" srv_nombre="' . $srv['srv_nombre'] . '"><i class="fas fa-edit"></i></a>
+                    <button type="button" class="btn btn-danger btnEliminarServicio" srv_id="' . $srv['srv_id'] . '"><i class="fa fa-trash-alt"></i></button>
                 </div>
                 ',
             );
@@ -533,19 +533,32 @@ class Controlador
     public static function guardarServicios()
     {
         $_POST['srv_nombre'] = trim(strtoupper($_POST['srv_nombre']));
-        $srv = Modelo::mdlMostrarServiciosByNombre($_POST['srv_nombre']);
-        if ($srv) {
-            return array(
-                'status' => false,
-                'mensaje' => 'El servicio con nombre ' . $_POST['srv_nombre'] . ' ya existe.',
-            );
+        if ($_POST['srv_id'] == "") {
+            $srv = Modelo::mdlMostrarServiciosByNombre($_POST['srv_nombre']);
+            if ($srv) {
+                return array(
+                    'status' => false,
+                    'mensaje' => 'El servicio con nombre ' . $_POST['srv_nombre'] . ' ya existe.',
+                );
+            }
+            $res = Modelo::mdlAgregarServicio($_POST);
+        } else {
+            $res = Modelo::mdlActualizarServicio($_POST);
         }
-
-        $res = Modelo::mdlAgregarServicio($_POST);
         if ($res) {
             return array('status' => true, 'mensaje' => 'El servicio se guardo correctamente.');
         } else {
             return array('status' => false, 'mensaje' => 'Hubo un error al guardar el servicio.');
+        }
+    }
+    public static function eliminarServicios()
+    {
+        $precio = Modelo::mdlEliminarPreciosByServicio($_POST['srv_id']);
+        $res = Modelo::mdlEliminarServicio($_POST['srv_id']);
+        if ($res) {
+            return array('status' => true, 'mensaje' => 'El servicio se elimino correctamente.');
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el servicio.');
         }
     }
 
@@ -634,7 +647,7 @@ class Controlador
     }
     public static function eliminarPaquete()
     {
-        $precio = Modelo::mdlEliminarPrecios($_POST['pqt_id']);
+        $precio = Modelo::mdlEliminarPreciosByPaquete($_POST['pqt_id']);
         if ($precio) {
             $res = Modelo::mdlEliminarPaquete($_POST['pqt_id']);
             if ($res) {
@@ -730,6 +743,10 @@ if (isset($_POST['btnMostrarPaquetes'])) {
 if (isset($_POST['btnEliminarPaquete'])) {
     $eliminarPaquete = new Controlador();
     echo json_encode($eliminarPaquete->eliminarPaquete(), true);
+}
+if (isset($_POST['btnEliminarServicio'])) {
+    $eliminarServicio = new Controlador();
+    echo json_encode($eliminarServicio->eliminarServicios(), true);
 }
 
 
