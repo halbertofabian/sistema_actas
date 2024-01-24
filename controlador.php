@@ -508,6 +508,144 @@ class Controlador
 
         return array('mensaje' => 'Se eliminaron ' . $contador_ar . ' actas realizadas. Y ' . $contador_at . ' archivos temporales.');
     }
+
+    public static function mostrarServicios()
+    {
+        $dt_servicios = array();
+        $servicios = Modelo::mdlMostrarServicios();
+        foreach ($servicios as $key => $srv) {
+            $dt_aux = array(
+                'srv_id' => $srv['srv_id'],
+                'srv_nombre' => $srv['srv_nombre'],
+                'srv_acciones' => '
+                <div class="btn-group" role="group" aria-label="">
+                    <button type="button" class="btn btn-warning btnEditarServicio" usr_id="' . $srv['srv_id'] . '" srv_nombre="' . $srv['srv_nombre'] . '"><i class="fas fa-edit"></i></a>
+                    <button type="button" class="btn btn-danger btnEliminarServicio" usr_id="' . $srv['srv_id'] . '"><i class="fa fa-trash-alt"></i></button>
+                </div>
+                ',
+            );
+
+            array_push($dt_servicios, $dt_aux);
+        }
+
+        return $dt_servicios;
+    }
+    public static function guardarServicios()
+    {
+        $_POST['srv_nombre'] = trim(strtoupper($_POST['srv_nombre']));
+        $srv = Modelo::mdlMostrarServiciosByNombre($_POST['srv_nombre']);
+        if ($srv) {
+            return array(
+                'status' => false,
+                'mensaje' => 'El servicio con nombre ' . $_POST['srv_nombre'] . ' ya existe.',
+            );
+        }
+
+        $res = Modelo::mdlAgregarServicio($_POST);
+        if ($res) {
+            return array('status' => true, 'mensaje' => 'El servicio se guardo correctamente.');
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al guardar el servicio.');
+        }
+    }
+
+    public static function mostrarServicios2()
+    {
+        $dt_servicios = array();
+        $servicios = Modelo::mdlMostrarServicios();
+        foreach ($servicios as $key => $srv) {
+            $dt_aux = array(
+                'srv_id' => $srv['srv_id'],
+                'srv_nombre' => $srv['srv_nombre'],
+                'srv_precio' => '<input type="text" class="form-control inputN" name="precios[' . $srv['srv_id'] . ']" id="" value="0" required>',
+            );
+
+            array_push($dt_servicios, $dt_aux);
+        }
+
+        return $dt_servicios;
+    }
+    public static function guardarPaquetes()
+    {
+        $_POST['pqt_nombre'] = trim(strtoupper($_POST['pqt_nombre']));
+        $pqt = Modelo::mdlMostrarPaquetesByNombre($_POST['pqt_nombre']);
+        if ($pqt) {
+            return array(
+                'status' => false,
+                'mensaje' => 'El paquete con nombre ' . $_POST['pqt_nombre'] . ' ya existe.',
+            );
+        }
+
+        $pqt_id = Modelo::mdlAgregarPaquete($_POST);
+        $precios = $_POST['precios'];
+        foreach ($precios as $srv_id => $precio) {
+            $datos = array(
+                'prc_id_srv' => $srv_id,
+                'prc_id_pqt' => $pqt_id,
+                'prc_precio' => dnum($precio),
+            );
+            Modelo::mdlAgregarPrecios($datos);
+        }
+        return array('status' => true, 'mensaje' => 'El paquete se guardo correctamente.', 'pqt_id' => $pqt_id);
+    }
+    public static function mostrarPrecios()
+    {
+        $dt_precios = array();
+        $precios = Modelo::mdlMostrarPreciosByPaquete($_POST['pqt_id']);
+        foreach ($precios as $key => $prc) {
+            $dt_aux = array(
+                'prc_id' => $prc['prc_id'],
+                'srv_nombre' => $prc['srv_nombre'],
+                'prc_precio' => '<input type="text" class="form-control inputN inputPqt" name="precios[' . $prc['prc_id'] . ']" id="" value="' . $prc['prc_precio'] . '" readonly>',
+            );
+
+            array_push($dt_precios, $dt_aux);
+        }
+
+        return $dt_precios;
+    }
+    public static function actualizarPrecios()
+    {
+        // $_POST['pqt_nombre'] = trim(strtoupper($_POST['pqt_nombre']));
+        // $pqt = Modelo::mdlMostrarPaquetesByNombre($_POST['pqt_nombre']);
+        // if ($pqt) {
+        //     return array(
+        //         'status' => false,
+        //         'mensaje' => 'El paquete con nombre ' . $_POST['pqt_nombre'] . ' ya existe.',
+        //     );
+        // }
+
+        // $pqt_id = Modelo::mdlAgregarPaquete($_POST);
+        $precios = $_POST['precios'];
+        foreach ($precios as $prc_id => $precio) {
+            $datos = array(
+                'prc_id' => $prc_id,
+                'prc_id_pqt' => $_POST['pqt_id'],
+                'prc_precio' => dnum($precio),
+            );
+            Modelo::mdlActualizarPrecios($datos);
+        }
+        return array('status' => true, 'mensaje' => 'Los datos se actualizaron correctamente.');
+    }
+    public static function mostrarPaquetes()
+    {
+        $paquetes = Modelo::mdlMostrarPaquetes();
+        return $paquetes;
+    }
+    public static function eliminarPaquete()
+    {
+        $precio = Modelo::mdlEliminarPrecios($_POST['pqt_id']);
+        if ($precio) {
+            $res = Modelo::mdlEliminarPaquete($_POST['pqt_id']);
+            if ($res) {
+                return array('status' => true, 'mensaje' => 'El paquete se elimino correctamente.');
+            } else {
+                return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el paquete.');
+            }
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el paquete.');
+        }
+    }
 }
 
 
@@ -560,6 +698,38 @@ if (isset($_POST['btnCerrarSesion'])) {
     session_destroy();
     echo json_encode(array('status' => true));
     exit();
+}
+if (isset($_POST['btnMostrarServicios'])) {
+    $mostrarServicios = new Controlador();
+    echo json_encode($mostrarServicios->mostrarServicios(), true);
+}
+if (isset($_POST['btnGuardarServicio'])) {
+    $guardarServicio = new Controlador();
+    echo json_encode($guardarServicio->guardarServicios(), true);
+}
+if (isset($_POST['btnMostrarServicios2'])) {
+    $mostrarServicios2 = new Controlador();
+    echo json_encode($mostrarServicios2->mostrarServicios2(), true);
+}
+if (isset($_POST['btnGuardarPaquetes'])) {
+    $guardarPaquete = new Controlador();
+    echo json_encode($guardarPaquete->guardarPaquetes(), true);
+}
+if (isset($_POST['btnActualizarPrecios'])) {
+    $actualizarPrecios = new Controlador();
+    echo json_encode($actualizarPrecios->actualizarPrecios(), true);
+}
+if (isset($_POST['btnMostrarPrecios'])) {
+    $mostrarPrecios = new Controlador();
+    echo json_encode($mostrarPrecios->mostrarPrecios(), true);
+}
+if (isset($_POST['btnMostrarPaquetes'])) {
+    $mostrarPaquetes = new Controlador();
+    echo json_encode($mostrarPaquetes->mostrarPaquetes(), true);
+}
+if (isset($_POST['btnEliminarPaquete'])) {
+    $eliminarPaquete = new Controlador();
+    echo json_encode($eliminarPaquete->eliminarPaquete(), true);
 }
 
 

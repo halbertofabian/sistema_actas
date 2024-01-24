@@ -44,174 +44,277 @@
             </div>
         </nav>
         <div class="container-fluid">
-            <div class="row justify-content-center  vh-100"> <!-- Agregado justify-content-center y align-items-center y vh-100 para centrado vertical y horizontal -->
-                <div class="col-12 col-md-10">
-                    <div class="card">
-                        <div class="card-body">
-                            <nav>
-                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                    <button class="nav-link active" id="nav-1-tab" data-bs-toggle="tab" data-bs-target="#nav-1" type="button" role="tab" aria-controls="nav-1" aria-selected="true">Generar acta</button>
-                                    <!-- <button class="nav-link" id="nav-2-tab" data-bs-toggle="tab" data-bs-target="#nav-2" type="button" role="tab" aria-controls="nav-2" aria-selected="false">Listar actas</button> -->
-                                    <button class="nav-link" id="nav-3-tab" data-bs-toggle="tab" data-bs-target="#nav-3" type="button" role="tab" aria-controls="nav-3" aria-selected="false">Reversos</button>
-                                    <button class="nav-link" id="nav-4-tab" data-bs-toggle="tab" data-bs-target="#nav-4" type="button" role="tab" aria-controls="nav-4" aria-selected="false">Usuarios</button>
-                                </div>
-                            </nav>
-                            <div class="tab-content" id="nav-tabContent">
-                                <div class="tab-pane fade show active" id="nav-1" role="tabpanel" aria-labelledby="nav-1-tab">
+
+            <div class="card">
+                <div class="card-body">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-1-tab" data-bs-toggle="tab" data-bs-target="#nav-1" type="button" role="tab" aria-controls="nav-1" aria-selected="true">Generar acta</button>
+                            <!-- <button class="nav-link" id="nav-2-tab" data-bs-toggle="tab" data-bs-target="#nav-2" type="button" role="tab" aria-controls="nav-2" aria-selected="false">Listar actas</button> -->
+                            <button class="nav-link" id="nav-3-tab" data-bs-toggle="tab" data-bs-target="#nav-3" type="button" role="tab" aria-controls="nav-3" aria-selected="false">Reversos</button>
+                            <button class="nav-link" id="nav-4-tab" data-bs-toggle="tab" data-bs-target="#nav-4" type="button" role="tab" aria-controls="nav-4" aria-selected="false">Usuarios</button>
+                            <button class="nav-link" id="nav-5-tab" data-bs-toggle="tab" data-bs-target="#nav-5" type="button" role="tab" aria-controls="nav-5" aria-selected="false">Servicios y paquetes</button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-1" role="tabpanel" aria-labelledby="nav-1-tab">
+                            <div class="row">
+                                <div class="col-12 col-md-4">
                                     <div class="row">
-                                        <div class="col-12 col-md-4">
-                                            <div class="row">
-                                                <div class="col-12 col-md-12">
-                                                    <form id="formUpload" method="post" enctype="multipart/form-data" class="mt-3 mb-2">
-                                                        <div class="mb-3">
-                                                            <label for="fileToUpload" class="form-label">Seleccione el archivo PDF para cargar:</label>
-                                                            <input type="file" class="form-control" name="fileToUpload" id="fileToUpload" accept=".pdf, .PDF" required>
-                                                        </div>
-                                                        <!-- <button type="submit" class="btn btn-primary btn-sm float-end" name="submit">Cargar PDF</button> -->
-                                                    </form>
+                                        <div class="col-12 col-md-12">
+                                            <form id="formUpload" method="post" enctype="multipart/form-data" class="mt-3 mb-2">
+                                                <div class="mb-3">
+                                                    <label for="fileToUpload" class="form-label">Seleccione el archivo PDF para cargar:</label>
+                                                    <input type="file" class="form-control" name="fileToUpload" id="fileToUpload" accept=".pdf, .PDF" required>
                                                 </div>
-                                                <div class="col-12 col-md-12">
-                                                    <div class="alert  mensajeCarga mt-3" role="alert">
-                                                        <strong id="msj_respuesta" style="font-size: 12px;"></strong>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-12 col-md-12 divPreConversion">
-
-                                                    <?php
-                                                    $array_estados = Controlador::obtenerClavesEstados();
-                                                    // print_r($estados);
-                                                    ?>
-                                                    <form id="formGenerarActa" method="post">
-                                                        <div class="form-group">
-                                                            <label for="clave_estado">Selecione un estado</label>
-                                                            <input type="hidden" id="ruta" name="ruta">
-                                                            <select name="clave_estado" id="clave_estado" class="form-control select2">
-                                                                <option value="">-Seleccionar-</option>
-                                                                <?php foreach ($array_estados as $key => $estados) : ?>
-                                                                    <option value="<?= $key ?>"><?= $estados ?></option>
-                                                                <?php endforeach; ?>
-
-                                                            </select>
-                                                            <small id="helpId" class="text-muted text-center" style="font-size: 8px;">Si el estado no se seleccionó automáticamente, por favor, elígelo manualmente. </small>
-                                                        </div>
-                                                        <hr>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" value="" name="sinReverso" id="sinReverso">
-                                                            <label class="form-check-label" for="sinReverso">
-                                                                Sin reverso
-                                                            </label>
-                                                        </div>
-                                                        <div>
-                                                            <button type="submit" class="btn btn-primary float-end" name="submit">Generar</button>
-                                                        </div>
-                                                    </form>
-
-                                                </div>
+                                                <!-- <button type="submit" class="btn btn-primary btn-sm float-end" name="submit">Cargar PDF</button> -->
+                                            </form>
+                                        </div>
+                                        <div class="col-12 col-md-12">
+                                            <div class="alert  mensajeCarga mt-3" role="alert">
+                                                <strong id="msj_respuesta" style="font-size: 12px;"></strong>
                                             </div>
                                         </div>
-                                        <div class="col-md-8 col-12">
-                                            <iframe class="iframe_acta" src="" frameborder="0" width="100%" height="500px"></iframe>
+
+                                        <div class="col-12 col-md-12 divPreConversion">
+
+                                            <?php
+                                            $array_estados = Controlador::obtenerClavesEstados();
+                                            // print_r($estados);
+                                            ?>
+                                            <form id="formGenerarActa" method="post">
+                                                <div class="form-group">
+                                                    <label for="clave_estado">Selecione un estado</label>
+                                                    <input type="hidden" id="ruta" name="ruta">
+                                                    <select name="clave_estado" id="clave_estado" class="form-control select2">
+                                                        <option value="">-Seleccionar-</option>
+                                                        <?php foreach ($array_estados as $key => $estados) : ?>
+                                                            <option value="<?= $key ?>"><?= $estados ?></option>
+                                                        <?php endforeach; ?>
+
+                                                    </select>
+                                                    <small id="helpId" class="text-muted text-center" style="font-size: 8px;">Si el estado no se seleccionó automáticamente, por favor, elígelo manualmente. </small>
+                                                </div>
+                                                <hr>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" name="sinReverso" id="sinReverso">
+                                                    <label class="form-check-label" for="sinReverso">
+                                                        Sin reverso
+                                                    </label>
+                                                </div>
+                                                <div>
+                                                    <button type="submit" class="btn btn-primary float-end" name="submit">Generar</button>
+                                                </div>
+                                            </form>
+
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="nav-2" role="tabpanel" aria-labelledby="nav-2-tab">
-                                    <div class="row mt-4">
+                                <div class="col-md-8 col-12">
+                                    <iframe class="iframe_acta" src="" frameborder="0" width="100%" height="500px"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-2" role="tabpanel" aria-labelledby="nav-2-tab">
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <table class="table table-hover " id="data_table_actas" style="width: 100%;">
+                                        <thead class="table-dark text-center">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>CURP</th>
+                                                <th>ACCIONES</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-3" role="tabpanel" aria-labelledby="nav-3-tab">
+                            <form id="formGuardarReversos" method="post">
+                                <div class="row mt-4">
+                                    <div class="col-12 col-md-4">
+                                        <div class="row">
+                                            <div class="col-12 col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="rvs_ruta" class="form-label">Seleccione el archivo PDF para cargar:</label>
+                                                    <input type="file" class="form-control" name="rvs_ruta" id="rvs_ruta" accept=".pdf, .PDF" required>
+                                                </div>
+                                                <!-- <button type="submit" class="btn btn-primary btn-sm float-end" name="submit">Cargar PDF</button> -->
+                                            </div>
+                                            <div class="col-12 col-md-12 divPreConversion">
+                                                <?php
+                                                $array_estados = Controlador::obtenerClavesEstados();
+                                                // print_r($estados);
+                                                ?>
+                                                <div class="form-group">
+                                                    <label for="rvs_clave">Selecione un estado</label>
+                                                    <select name="rvs_clave" id="rvs_clave" class="form-control select2" required>
+                                                        <option value="">-Seleccionar-</option>
+                                                        <?php foreach ($array_estados as $key => $estados) : ?>
+                                                            <option value="<?= $key ?>"><?= $estados ?></option>
+                                                        <?php endforeach; ?>
+
+                                                    </select>
+                                                </div>
+                                                <hr>
+                                                <div>
+                                                    <button type="submit" class="btn btn-primary float-end" name="submit">Guardar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 col-12">
+
                                         <div class="col-12">
-                                            <table class="table table-hover " id="data_table_actas" style="width: 100%;">
+                                            <table class="table table-hover " id="data_table_reversos" style="width: 100%;">
                                                 <thead class="table-dark text-center">
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>CURP</th>
+                                                        <th>ESTADO</th>
                                                         <th>ACCIONES</th>
                                                     </tr>
                                                 </thead>
                                             </table>
                                         </div>
+
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="nav-3" role="tabpanel" aria-labelledby="nav-3-tab">
-                                    <form id="formGuardarReversos" method="post">
-                                        <div class="row mt-4">
-                                            <div class="col-12 col-md-4">
-                                                <div class="row">
-                                                    <div class="col-12 col-md-12">
-                                                        <div class="mb-3">
-                                                            <label for="rvs_ruta" class="form-label">Seleccione el archivo PDF para cargar:</label>
-                                                            <input type="file" class="form-control" name="rvs_ruta" id="rvs_ruta" accept=".pdf, .PDF" required>
-                                                        </div>
-                                                        <!-- <button type="submit" class="btn btn-primary btn-sm float-end" name="submit">Cargar PDF</button> -->
-                                                    </div>
-                                                    <div class="col-12 col-md-12 divPreConversion">
-                                                        <?php
-                                                        $array_estados = Controlador::obtenerClavesEstados();
-                                                        // print_r($estados);
-                                                        ?>
-                                                        <div class="form-group">
-                                                            <label for="rvs_clave">Selecione un estado</label>
-                                                            <select name="rvs_clave" id="rvs_clave" class="form-control select2" required>
-                                                                <option value="">-Seleccionar-</option>
-                                                                <?php foreach ($array_estados as $key => $estados) : ?>
-                                                                    <option value="<?= $key ?>"><?= $estados ?></option>
-                                                                <?php endforeach; ?>
-
-                                                            </select>
-                                                        </div>
-                                                        <hr>
-                                                        <div>
-                                                            <button type="submit" class="btn btn-primary float-end" name="submit">Guardar</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-8 col-12">
-
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="nav-4" role="tabpanel" aria-labelledby="nav-4-tab">
+                            <div class="row">
+                                <form id="formGuardarUsuario" class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="usr_correo" class="form-label">Correo</label>
+                                        <input type="hidden" name="usr_id" id="usr_id">
+                                        <input type="email" class="form-control" name="usr_correo" id="usr_correo" placeholder="example@hotmail.com" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="usr_contraseña" class="form-label">Contraseña</label>
+                                        <input type="password" class="form-control" name="usr_contraseña" id="usr_contraseña" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <button type="submit" class="btn btn-primary float-end">
+                                            Guardar
+                                        </button>
+                                    </div>
+                                </form>
+                                <div class="col-md-8">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="data_table_usuarios" style="width: 100%;">
+                                            <thead class="table-dark text-center">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">CORREO</th>
+                                                    <th scope="col">ACCIONES</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-5" role="tabpanel" aria-labelledby="nav-5-tab">
+                            <div class="row">
+                                <div class="col-md-4 col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Servicios</h4>
+                                            <form id="formNewServicios" class="row g-3">
                                                 <div class="col-12">
-                                                    <table class="table table-hover " id="data_table_reversos" style="width: 100%;">
-                                                        <thead class="table-dark text-center">
-                                                            <tr>
-                                                                <th>#</th>
-                                                                <th>ESTADO</th>
-                                                                <th>ACCIONES</th>
-                                                            </tr>
-                                                        </thead>
-                                                    </table>
+                                                    <label for="srv_nombre" class="form-label">Nombre del servicio</label>
+                                                    <input type="text" class="form-control text-uppercase" name="srv_nombre" id="srv_nombre" placeholder="" required />
                                                 </div>
-
+                                                <div class="col-12">
+                                                    <button type="submit" class="btn btn-primary float-end">
+                                                        Guardar
+                                                    </button>
+                                                </div>
+                                            </form>
+                                            <div class="row">
+                                                <div class="col-12 mt-3">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover" id="data_table_servicios" style="width: 100%;">
+                                                            <thead class="table-dark text-center">
+                                                                <tr>
+                                                                    <th scope="col">#</th>
+                                                                    <th scope="col">NOMBRE</th>
+                                                                    <th scope="col">ACCIONES</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </form>
+                                    </div>
                                 </div>
-                                <div class="tab-pane fade" id="nav-4" role="tabpanel" aria-labelledby="nav-4-tab">
-                                    <div class="row">
-                                        <form id="formGuardarUsuario" class="col-md-4">
-                                            <div class="mb-3">
-                                                <label for="usr_correo" class="form-label">Correo</label>
-                                                <input type="hidden" name="usr_id" id="usr_id">
-                                                <input type="email" class="form-control" name="usr_correo" id="usr_correo" placeholder="example@hotmail.com" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="usr_contraseña" class="form-label">Contraseña</label>
-                                                <input type="password" class="form-control" name="usr_contraseña" id="usr_contraseña" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <button type="submit" class="btn btn-primary float-end">
-                                                    Guardar
-                                                </button>
-                                            </div>
-                                        </form>
-                                        <div class="col-md-8">
-                                            <div class="table-responsive">
-                                                <table class="table table-hover" id="data_table_usuarios" style="width: 100%;">
-                                                    <thead class="table-dark text-center">
-                                                        <tr>
-                                                            <th scope="col">#</th>
-                                                            <th scope="col">CORREO</th>
-                                                            <th scope="col">ACCIONES</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
+                                <div class="col-md-4 col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Paquetes</h4>
+                                            <form id="formNewPaquetes" class="row g-3">
+                                                <div class="col-12">
+                                                    <label for="pqt_nombre" class="form-label">Nombre del paquete</label>
+                                                    <input type="text" class="form-control text-uppercase" name="pqt_nombre" id="pqt_nombre" placeholder="" required />
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover" id="data_table_servicios2" style="width: 100%;">
+                                                            <thead class="table-dark text-center">
+                                                                <tr>
+                                                                    <th scope="col">#</th>
+                                                                    <th scope="col">SERVICIO</th>
+                                                                    <th scope="col">PRECIO</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button type="submit" class="btn btn-primary float-end">
+                                                        Guardar
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Precios</h4>
+                                            <form id="formActualizarPrecios" class="row g-3">
+                                                <div class="col-12">
+                                                    <label for="pqt_id" class="form-label">Paquetes</label>
+                                                    <div class="input-group">
+                                                        <select class="form-select select2" name="pqt_id" id="pqt_id">
+                                                            <option selected value="">-Seleccionar-</option>
+                                                        </select>
+                                                        <button class="btn btn-warning btnEditarPaquete d-none" type="button"><i class="fa fa-edit"></i></button>
+                                                        <button class="btn btn-danger btnEliminarPaquete d-none" type="button"><i class="fa fa-trash-alt"></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover" id="data_table_precios" style="width: 100%;">
+                                                            <thead class="table-dark text-center">
+                                                                <tr>
+                                                                    <th scope="col">#</th>
+                                                                    <th scope="col">SERVICIO</th>
+                                                                    <th scope="col">PRECIO</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 d-none btnActualizarPqt">
+                                                    <button type="submit" class="btn btn-primary float-end">
+                                                        Guardar
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -223,16 +326,14 @@
         </div>
 
 
-
-
-
-
         <!-- Optional JavaScript; choose one of the two! -->
 
         <!-- Option 1: Bootstrap Bundle with Popper -->
         <script src="<?= HTTP_HOST ?>app-assets/js/bootstrap.min.js"></script>
         <script src="<?= HTTP_HOST ?>app-assets/js/fontawesome.min.js"></script>
         <script src="<?= HTTP_HOST ?>app-assets/js/select2.min.js"></script>
+        <script src="<?= HTTP_HOST ?>app-assets/js/jquery.number.js"></script>
+
 
         <!-- Option 2: Separate Popper and Bootstrap JS -->
         <!--
@@ -248,9 +349,17 @@
                         dropdownParent: $(this).parent(),
                     });
                 });
+
                 mostrarActas();
                 mostrarReversos();
                 mostrarUsuarios();
+                mostrarServicios();
+                mostrarServicios2();
+                mostrarPaquetes();
+
+                setTimeout(() => {
+                    $(".inputN").number(true, 2);
+                }, 500);
 
                 $("#fileToUpload").on("change", function() {
                     $("#formUpload").submit(); // Envía el formulario cuando se selecciona un archivo
@@ -636,7 +745,268 @@
             $("#nav-4-tab").click(function() {
                 $('#formGuardarUsuario')[0].reset();
                 $("#usr_id").val("");
-            })
+            });
+
+            function mostrarServicios() {
+                data_table_usuarios = $('#data_table_servicios').DataTable({
+                    responsive: true,
+                    'ajax': {
+                        'url': 'controlador.php',
+                        'method': 'POST', //usamos el metodo POST
+                        'data': {
+                            btnMostrarServicios: true,
+                        }, //enviamos opcion 4 para que haga un SELECT
+                        'dataSrc': ''
+                    },
+                    'bDestroy': true,
+                    order: false,
+                    'columns': [{
+                            'data': 'srv_id',
+
+                        },
+                        {
+                            'data': 'srv_nombre'
+                        },
+                        {
+                            'data': 'srv_acciones'
+                        },
+                    ]
+                });
+            }
+            $('#formNewServicios').on('submit', function(e) {
+                e.preventDefault();
+                var datos = new FormData(this)
+                datos.append('btnGuardarServicio', true);
+                $.ajax({
+                    type: 'POST',
+                    url: 'controlador.php',
+                    data: datos,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            swal({
+                                title: '¡Bien!',
+                                text: res.mensaje,
+                                type: 'success',
+                                icon: 'success'
+                            }).then(function() {
+                                $("#srv_nombre").val("");
+                                mostrarServicios();
+                                mostrarServicios2();
+                                setTimeout(() => {
+                                    $(".inputN").number(true, 2);
+                                }, 500);
+                            });
+                        } else {
+                            swal('Oops', res.mensaje, 'error');
+                        }
+                    }
+                });
+            });
+
+            function mostrarServicios2() {
+                data_table_usuarios = $('#data_table_servicios2').DataTable({
+                    responsive: true,
+                    'ajax': {
+                        'url': 'controlador.php',
+                        'method': 'POST', //usamos el metodo POST
+                        'data': {
+                            btnMostrarServicios2: true,
+                        }, //enviamos opcion 4 para que haga un SELECT
+                        'dataSrc': ''
+                    },
+                    'bDestroy': true,
+                    order: false,
+                    'columns': [{
+                            'data': 'srv_id',
+
+                        },
+                        {
+                            'data': 'srv_nombre'
+                        },
+                        {
+                            'data': 'srv_precio'
+                        },
+                    ]
+                });
+            }
+            $('#formNewPaquetes').on('submit', function(e) {
+                e.preventDefault();
+                var datos = new FormData(this)
+                datos.append('btnGuardarPaquetes', true);
+                $.ajax({
+                    type: 'POST',
+                    url: 'controlador.php',
+                    data: datos,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            swal({
+                                title: '¡Bien!',
+                                text: res.mensaje,
+                                type: 'success',
+                                icon: 'success'
+                            }).then(function() {
+                                $("#pqt_nombre").val("");
+                                mostrarPaquetes();
+                                mostrarServicios2();
+                                setTimeout(() => {
+                                    $("#pqt_id").val(res.pqt_id).trigger('change');
+
+                                    $(".inputN").number(true, 2);
+                                }, 500);
+                            });
+                        } else {
+                            swal('Oops', res.mensaje, 'error');
+                        }
+                    }
+                });
+            });
+
+            function mostrarPaquetes() {
+                var datos = new FormData()
+                datos.append('btnMostrarPaquetes', true);
+                $.ajax({
+                    type: 'POST',
+                    url: 'controlador.php',
+                    data: datos,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        $("#pqt_id").html('<option value="" selected>-Seleccionar-</option>');
+                        res.forEach(pqt => {
+                            $("#pqt_id").append(`<option value="${pqt.pqt_id}">${pqt.pqt_nombre}</option>`);
+                        });
+                    }
+                });
+            }
+
+            function mostrarPrecios() {
+                data_table_precios = $('#data_table_precios').DataTable({
+                    responsive: true,
+                    'ajax': {
+                        'url': 'controlador.php',
+                        'method': 'POST', //usamos el metodo POST
+                        'data': {
+                            btnMostrarPrecios: true,
+                            pqt_id: $('#pqt_id').val(),
+                        }, //enviamos opcion 4 para que haga un SELECT
+                        'dataSrc': ''
+                    },
+                    'bDestroy': true,
+                    'ordering': false,
+                    order: false,
+                    'columns': [{
+                            'data': 'prc_id'
+                        },
+                        {
+                            'data': 'srv_nombre'
+                        },
+                        {
+                            'data': 'prc_precio'
+                        },
+                    ]
+                });
+            }
+            $('#pqt_id').on('change', function() {
+                $(".btnActualizarPqt").addClass('d-none')
+                var pqt_id = $(this).val();
+                if (pqt_id != "") {
+                    $('.btnEditarPaquete').removeClass('d-none');
+                    $('.btnEliminarPaquete').removeClass('d-none');
+                } else {
+                    $('.btnEditarPaquete').addClass('d-none');
+                    $('.btnEliminarPaquete').addClass('d-none');
+                }
+                mostrarPrecios();
+            });
+            $(document).on('click', '.btnEditarPaquete', function() {
+                $('.inputPqt').attr('readonly', false);
+                $(".btnActualizarPqt").removeClass('d-none');
+                $(".inputN").number(true, 2);
+            });
+            $(document).on('click', '.btnEliminarPaquete', function() {
+                $('.inputPqt').attr('readonly', true);
+                $(".btnActualizarPqt").addClass('d-none');
+                swal({
+                    title: '¿Esta seguro de eliminar este paquete?',
+                    text: 'Esta accion no es reversible',
+                    icon: 'warning',
+                    buttons: ['No', 'Si, eliminar'],
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        var pqt_id = $("#pqt_id").val();
+                        var datos = new FormData()
+                        datos.append('pqt_id', pqt_id);
+                        datos.append('btnEliminarPaquete', true);
+                        $.ajax({
+                            type: 'POST',
+                            url: 'controlador.php',
+                            data: datos,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function(res) {
+                                if (res.status) {
+                                    swal({
+                                        title: '¡Bien!',
+                                        text: res.mensaje,
+                                        type: 'success',
+                                        icon: 'success'
+                                    }).then(function() {
+                                        mostrarPaquetes();
+                                        mostrarPrecios();
+                                        setTimeout(() => {
+                                            $('#pqt_id').change();
+                                        }, 500);
+                                    });
+                                } else {
+                                    swal('Oops', res.mensaje, 'error');
+                                }
+                            }
+                        });
+                    } else {}
+                });
+            });
+
+            $('#formActualizarPrecios').on('submit', function(e) {
+                e.preventDefault();
+                var datos = new FormData(this)
+                datos.append('btnActualizarPrecios', true);
+                $.ajax({
+                    type: 'POST',
+                    url: 'controlador.php',
+                    data: datos,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            swal({
+                                title: '¡Bien!',
+                                text: res.mensaje,
+                                type: 'success',
+                                icon: 'success'
+                            }).then(function() {
+                                var pqt_id = $("#pqt_id").val();
+                                $("#pqt_id").val(pqt_id).trigger('change');
+                                mostrarPrecios();
+                                setTimeout(() => {
+                                    $(".inputN").number(true, 2);
+                                }, 500);
+                            });
+                        } else {
+                            swal('Oops', res.mensaje, 'error');
+                        }
+                    }
+                });
+            });
         </script>
     </body>
 

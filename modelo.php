@@ -312,4 +312,200 @@ class Modelo
             $con = null;
         }
     }
+    public static function mdlMostrarServicios()
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_servicios_srv WHERE srv_estado_borrado = 1 ORDER BY srv_id DESC ";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->execute();
+            return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlMostrarServiciosByNombre($srv_nombre)
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_servicios_srv WHERE srv_estado_borrado = 1 AND srv_nombre = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $srv_nombre);
+            $pps->execute();
+            return $pps->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlAgregarServicio($srv)
+    {
+        try {
+            //code...
+            $sql = "INSERT INTO tbl_servicios_srv (srv_nombre) VALUES (?)";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $srv['srv_nombre']);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
+    public static function mdlMostrarPaquetesByNombre($pqt_nombre)
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_paquetes_pqt WHERE pqt_estado_borrado = 1 AND pqt_nombre = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $pqt_nombre);
+            $pps->execute();
+            return $pps->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
+    public static function mdlAgregarPaquete($pqt)
+    {
+        try {
+            //code...
+            $sql = "INSERT INTO tbl_paquetes_pqt (pqt_nombre) VALUES (?)";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $pqt['pqt_nombre']);
+            $pps->execute();
+            return $con->lastInsertId();
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlAgregarPrecios($prc)
+    {
+        try {
+            //code...
+            $sql = "INSERT INTO tbl_precios_prc (prc_id_srv, prc_id_pqt, prc_precio) VALUES (?,?,?)";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $prc['prc_id_srv']);
+            $pps->bindValue(2, $prc['prc_id_pqt']);
+            $pps->bindValue(3, $prc['prc_precio']);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlActualizarPrecios($prc)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_precios_prc SET prc_precio = ? WHERE prc_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $prc['prc_precio']);
+            $pps->bindValue(2, $prc['prc_id']);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
+    public static function mdlMostrarPaquetes()
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_paquetes_pqt WHERE pqt_estado_borrado = 1 ORDER BY pqt_id DESC ";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->execute();
+            return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlMostrarPreciosByPaquete($prc_id_pqt)
+    {
+        try {
+            //code...
+            $sql = "SELECT prc.*, srv.srv_nombre, pqt.* 
+            FROM tbl_precios_prc prc
+            JOIN tbl_servicios_srv srv ON prc.prc_id_srv = srv.srv_id
+            JOIN tbl_paquetes_pqt pqt ON prc.prc_id_pqt = pqt.pqt_id
+            WHERE prc.prc_id_pqt = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $prc_id_pqt);
+            $pps->execute();
+            return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
+    public static function mdlEliminarPrecios($prc_id_pqt)
+    {
+        try {
+            //code...
+            $sql = "DELETE FROM tbl_precios_prc WHERE prc_id_pqt = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $prc_id_pqt);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlEliminarPaquete($pqt_id)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_paquetes_pqt SET pqt_estado_borrado = 0 WHERE pqt_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $pqt_id);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
 }

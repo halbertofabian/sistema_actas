@@ -48,3 +48,9 @@ function iniciarApp()
 
     include_once './principal.php';
 }
+function dnum($numero)
+{
+    $numero = str_replace(',', '', $numero);
+    $numero = str_replace('$', '', $numero);
+    return $numero;
+}
