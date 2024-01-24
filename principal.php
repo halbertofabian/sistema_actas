@@ -284,7 +284,7 @@
                                 <div class="col-md-4 col-12">
                                     <div class="card bg-light">
                                         <div class="card-body">
-                                            <h4 class="card-title">Precios</h4>
+                                            <h4 class="card-title">Lista de precios</h4>
                                             <form id="formActualizarPrecios" class="row g-3">
                                                 <div class="col-12">
                                                     <label for="pqt_id" class="form-label">Paquetes</label>
