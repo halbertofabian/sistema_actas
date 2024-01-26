@@ -560,4 +560,59 @@ class Modelo
             $con = null;
         }
     }
+    public static function mdlGuardarClientes($clt)
+    {
+        try {
+            //code...
+            $sql = "INSERT INTO tbl_clientes_clt (clt_nombre, clt_wpp, clt_gpo_wpp, clt_tipo_corte, clt_paquete) VALUES (?,?,?,?,?)";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $clt['clt_nombre']);
+            $pps->bindValue(2, $clt['clt_wpp']);
+            $pps->bindValue(3, $clt['clt_gpo_wpp']);
+            $pps->bindValue(4, $clt['clt_tipo_corte']);
+            $pps->bindValue(5, $clt['clt_paquete']);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
+    public static function mdlMostrarClienteById($clt_id)
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_clientes_clt WHERE clt_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $clt_id);
+            $pps->execute();
+            return $pps->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlMostrarClientes()
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_clientes_clt ORDER BY clt_id DESC";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->execute();
+            return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
 }

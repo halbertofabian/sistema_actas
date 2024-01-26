@@ -659,6 +659,46 @@ class Controlador
             return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el paquete.');
         }
     }
+
+    public static function guardarCliente()
+    {
+        if ($_POST['clt_tipo_corte'] == "W") {
+            $array_tipo = array('tipo' => "W", 'valor' => $_POST['datos_corte_wpp']);
+        } else if ($_POST['clt_tipo_corte'] == "G") {
+            $array_tipo = array('tipo' => "G", 'valor' => $_POST['datos_corte_gpo']);
+        }
+
+        $_POST['clt_tipo_corte'] = json_encode($array_tipo, true);
+        $res = Modelo::mdlGuardarClientes($_POST);
+        if ($res) {
+            return array('status' => true, 'mensaje' => 'El cliente se guardo correctamente.');
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al guardar el cliente.');
+        }
+    }
+    public static function mostrarClientes()
+    {
+        $dt_clientes = array();
+        $clientes = Modelo::mdlMostrarClientes();
+        foreach ($clientes as $key => $clt) {
+            $dt_aux = array(
+                'clt_id' => $clt['clt_id'],
+                'clt_nombre' => $clt['clt_nombre'],
+                'clt_gpo_wpp' => $clt['clt_gpo_wpp'],
+                'srv_acciones' => '
+                <div class="btn-group" role="group" aria-label="">
+                    <button type="button" class="btn btn-warning btnEditarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fas fa-edit"></i></a>
+                    <button type="button" class="btn btn-danger btnEliminarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fa fa-trash-alt"></i></button>
+                    <a type="button" class="btn btn-light" href="' . HTTP_HOST . 'cortes.php?cliente=' . $clt['clt_id'] . '"><i class="fa fa-cash-register"></i></a>
+                </div>
+                ',
+            );
+
+            array_push($dt_clientes, $dt_aux);
+        }
+
+        return $dt_clientes;
+    }
 }
 
 
@@ -747,6 +787,14 @@ if (isset($_POST['btnEliminarPaquete'])) {
 if (isset($_POST['btnEliminarServicio'])) {
     $eliminarServicio = new Controlador();
     echo json_encode($eliminarServicio->eliminarServicios(), true);
+}
+if (isset($_POST['btnGuardarCliente'])) {
+    $guardarCliente = new Controlador();
+    echo json_encode($guardarCliente->guardarCliente(), true);
+}
+if (isset($_POST['btnMostrarClientes'])) {
+    $mostrarClientes = new Controlador();
+    echo json_encode($mostrarClientes->mostrarClientes(), true);
 }
 
 

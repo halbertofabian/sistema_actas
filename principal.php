@@ -54,6 +54,7 @@
                             <button class="nav-link" id="nav-3-tab" data-bs-toggle="tab" data-bs-target="#nav-3" type="button" role="tab" aria-controls="nav-3" aria-selected="false">Reversos</button>
                             <button class="nav-link" id="nav-4-tab" data-bs-toggle="tab" data-bs-target="#nav-4" type="button" role="tab" aria-controls="nav-4" aria-selected="false">Usuarios</button>
                             <button class="nav-link" id="nav-5-tab" data-bs-toggle="tab" data-bs-target="#nav-5" type="button" role="tab" aria-controls="nav-5" aria-selected="false">Servicios y paquetes</button>
+                            <button class="nav-link" id="nav-6-tab" data-bs-toggle="tab" data-bs-target="#nav-6" type="button" role="tab" aria-controls="nav-6" aria-selected="false">Clientes</button>
                         </div>
                     </nav>
                     <div class="tab-content" id="nav-tabContent">
@@ -290,7 +291,7 @@
                                                 <div class="col-12">
                                                     <label for="pqt_id" class="form-label">Paquetes</label>
                                                     <div class="input-group">
-                                                        <select class="form-select select2" name="pqt_id" id="pqt_id">
+                                                        <select class="form-select select2 pqt_precios" name="pqt_id" id="pqt_id">
                                                             <option selected value="">-Seleccionar-</option>
                                                         </select>
                                                         <button class="btn btn-warning btnEditarPaquete d-none" type="button"><i class="fa fa-edit"></i></button>
@@ -321,6 +322,74 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-pane fade" id="nav-6" role="tabpanel" aria-labelledby="nav-6-tab">
+                            <div class="row">
+                                <div class="col-md-8 col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="data_table_clientes" style="width: 100%;">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">NOMBRE</th>
+                                                    <th scope="col">GRUPO</th>
+                                                    <th scope="col">ACCIONES</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Nuevo cliente</h4>
+                                            <form id="formGuardarCliente" class="row g-3">
+                                                <div class="col-12">
+                                                    <label for="clt_nombre" class="form-label">Nombre</label>
+                                                    <input type="text" class="form-control text-uppercase" name="clt_nombre" id="clt_nombre" placeholder="" required />
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="clt_wpp" class="form-label">Whatsapp</label>
+                                                    <input type="text" class="form-control isset_wpp" name="clt_wpp" id="clt_wpp" placeholder="" required />
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="clt_gpo_wpp" class="form-label">Grupo de Whatsapp</label>
+                                                    <select class="form-select select2" name="clt_gpo_wpp" id="clt_gpo_wpp" required>
+
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="clt_tipo_corte" class="form-label">¿A donde mandar el corte?</label>
+                                                    <select class="form-select" name="clt_tipo_corte" id="clt_tipo_corte" required>
+                                                        <option value="">-Seleccionar-</option>
+                                                        <option value="W">Whatsapp</option>
+                                                        <option value="G">Grupo</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 datos_corte_wpp d-none">
+                                                    <input type="text" class="form-control isset_wpp" name="datos_corte_wpp" id="datos_corte_wpp" placeholder="Escriba aqui su numero o grupo" />
+                                                </div>
+                                                <div class="col-12 datos_corte_gpo d-none">
+                                                    <select class="form-select select2" name="datos_corte_gpo" id="datos_corte_gpo">
+
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="clt_paquete" class="form-label">Lista de precios</label>
+                                                    <select class="form-select select2 pqt_precios" name="clt_paquete" id="clt_paquete" required>
+
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button type="submit" class="btn btn-primary float-end">
+                                                        Guardar
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -334,6 +403,7 @@
         <script src="<?= HTTP_HOST ?>app-assets/js/fontawesome.min.js"></script>
         <script src="<?= HTTP_HOST ?>app-assets/js/select2.min.js"></script>
         <script src="<?= HTTP_HOST ?>app-assets/js/jquery.number.js"></script>
+        <script src="<?= HTTP_HOST ?>app-assets/js/jquery.mask.min.js"></script>
 
 
         <!-- Option 2: Separate Popper and Bootstrap JS -->
@@ -344,6 +414,7 @@
 
         <script>
             $(document).ready(function() {
+                $(".isset_wpp").mask('0000000000');
                 $('.select2').each(function() {
                     $(this).select2({
                         theme: 'bootstrap-5',
@@ -357,6 +428,9 @@
                 mostrarServicios();
                 mostrarServicios2();
                 mostrarPaquetes();
+                mostrarClientes();
+
+                obtenerGruposWhatsapp();
 
                 setTimeout(() => {
                     $(".inputN").number(true, 2);
@@ -744,14 +818,31 @@
             });
 
             $("#nav-4-tab").click(function() {
-                $('#formGuardarUsuario')[0].reset();
-                $("#usr_id").val("");
+                limpiarDatos();
             });
             $("#nav-5-tab").click(function() {
+                limpiarDatos();
+            });
+            $("#nav-6-tab").click(function() {
+                limpiarDatos();
+            });
+
+            function limpiarDatos() {
+                //usuarios
+                $('#formGuardarUsuario')[0].reset();
+                $("#usr_id").val("");
+                //servicios y paquetes
                 $("#srv_nombre").val("");
                 $("#srv_id").val("");
                 $("#btnGuardarSrv").text('Guardar');
-            });
+                //clientes
+                $('#formGuardarCliente')[0].reset();
+                obtenerGruposWhatsapp();
+                $("#datos_corte_wpp").val("");
+                $("#datos_corte_gpo").val("").trigger('change');
+                $(".datos_corte_wpp").addClass('d-none');
+                $(".datos_corte_gpo").addClass('d-none');
+            }
 
             function mostrarServicios() {
                 data_table_usuarios = $('#data_table_servicios').DataTable({
@@ -859,7 +950,7 @@
                                             $(".inputN").number(true, 2);
                                         }, 500);
                                     });
-                                }else{
+                                } else {
                                     swal('Oops', res.mensaje, 'error');
                                 }
                             }
@@ -941,9 +1032,9 @@
                     processData: false,
                     contentType: false,
                     success: function(res) {
-                        $("#pqt_id").html('<option value="" selected>-Seleccionar-</option>');
+                        $(".pqt_precios").html('<option value="" selected>-Seleccionar-</option>');
                         res.forEach(pqt => {
-                            $("#pqt_id").append(`<option value="${pqt.pqt_id}">${pqt.pqt_nombre}</option>`);
+                            $(".pqt_precios").append(`<option value="${pqt.pqt_id}">${pqt.pqt_nombre}</option>`);
                         });
                     }
                 });
@@ -1070,6 +1161,110 @@
                     }
                 });
             });
+
+            //AQUI EMPIEZA LO DE LOS CLIENTE
+
+            function obtenerGruposWhatsapp() {
+                var settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://api.ultramsg.com/instance73569/groups",
+                    "method": "GET",
+                    "headers": {},
+                    "data": {
+                        "token": "dmvqtf79zia7pdkq"
+                    }
+                }
+
+                $.ajax(settings).done(function(response) {
+                    $("#clt_gpo_wpp").html(`<option value="">-Seleccionar-</option>`);
+                    $("#datos_corte_gpo").html(`<option value="">-Seleccionar-</option>`);
+                    response.forEach(gpo => {
+                        $("#clt_gpo_wpp").append(`<option value="${gpo.id}">${gpo.name}</option>`);
+                        $("#datos_corte_gpo").append(`<option value="${gpo.id}">${gpo.name}</option>`);
+                    });
+                });
+            }
+
+            $('#clt_tipo_corte').on('change', function() {
+                var clt_tipo = $(this).val();
+                if (clt_tipo == "W") {
+                    var clt_wpp = $("#clt_wpp").val();
+                    $("#datos_corte_wpp").val(clt_wpp);
+                    $(".datos_corte_wpp").removeClass('d-none');
+                    $(".datos_corte_gpo").addClass('d-none');
+                } else if (clt_tipo == "G") {
+                    var clt_gpo_wpp = $("#clt_gpo_wpp").val();
+                    $("#datos_corte_gpo").val(clt_gpo_wpp).trigger('change');
+                    $(".datos_corte_wpp").addClass('d-none');
+                    $(".datos_corte_gpo").removeClass('d-none');
+                } else {
+                    $("#datos_corte_wpp").val("");
+                    $("#datos_corte_gpo").val("").trigger('change');
+                    $(".datos_corte_wpp").addClass('d-none');
+                    $(".datos_corte_gpo").addClass('d-none');
+                }
+            });
+
+            $('#formGuardarCliente').on('submit', function(e) {
+                e.preventDefault();
+                var datos = new FormData(this)
+                datos.append('btnGuardarCliente', true);
+                $.ajax({
+                    type: 'POST',
+                    url: 'controlador.php',
+                    data: datos,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            swal({
+                                title: '¡Bien!',
+                                text: res.mensaje,
+                                type: 'success',
+                                icon: 'success'
+                            }).then(function() {
+                                limpiarDatos();
+                                mostrarPaquetes();
+                                mostrarClientes();
+                            });
+                        } else {
+                            swal('Oops', res.mensaje, 'error');
+                        }
+                    }
+                });
+            });
+
+            function mostrarClientes() {
+                data_table_clientes = $('#data_table_clientes').DataTable({
+                    responsive: true,
+                    'ajax': {
+                        'url': 'controlador.php',
+                        'method': 'POST', //usamos el metodo POST
+                        'data': {
+                            btnMostrarClientes: true,
+                        }, //enviamos opcion 4 para que haga un SELECT
+                        'dataSrc': ''
+                    },
+                    'bDestroy': true,
+                    'ordering': false,
+                    order: false,
+                    'columns': [{
+                            'data': 'clt_id'
+                        },
+                        {
+                            'data': 'clt_nombre'
+                        },
+                        {
+                            'data': 'clt_gpo_wpp'
+                        },
+                        {
+                            'data': 'srv_acciones'
+                        },
+                    ]
+                });
+            }
         </script>
     </body>
 
