@@ -582,6 +582,29 @@ class Modelo
         }
     }
 
+    public static function mdlAcutualizarClientes($clt)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_clientes_clt SET clt_nombre = ?, clt_wpp = ?, clt_gpo_wpp = ?, clt_tipo_corte = ?, clt_paquete = ? WHERE clt_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $clt['clt_nombre']);
+            $pps->bindValue(2, $clt['clt_wpp']);
+            $pps->bindValue(3, $clt['clt_gpo_wpp']);
+            $pps->bindValue(4, $clt['clt_tipo_corte']);
+            $pps->bindValue(5, $clt['clt_paquete']);
+            $pps->bindValue(6, $clt['clt_id']);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
     public static function mdlMostrarClienteById($clt_id)
     {
         try {
@@ -608,6 +631,23 @@ class Modelo
             $pps = $con->prepare($sql);
             $pps->execute();
             return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlEliminarCliente($clt_id)
+    {
+        try {
+            //code...
+            $sql = "DELETE FROM tbl_clientes_clt WHERE clt_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $clt_id);
+            $pps->execute();
+            return $pps->rowCount() > 0;
         } catch (PDOException $th) {
             //throw $th;
         } finally {

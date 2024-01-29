@@ -669,9 +669,17 @@ class Controlador
         }
 
         $_POST['clt_tipo_corte'] = json_encode($array_tipo, true);
-        $res = Modelo::mdlGuardarClientes($_POST);
+        $_POST['clt_nombre'] = strtoupper($_POST['clt_nombre']);
+        $mensaje = "";
+        if ($_POST['clt_id'] == "") {
+            $res = Modelo::mdlGuardarClientes($_POST);
+            $mensaje = 'El cliente se guardo correctamente.';
+        } else {
+            $res = Modelo::mdlAcutualizarClientes($_POST);
+            $mensaje = 'El cliente se actualizo correctamente.';
+        }
         if ($res) {
-            return array('status' => true, 'mensaje' => 'El cliente se guardo correctamente.');
+            return array('status' => true, 'mensaje' => $mensaje);
         } else {
             return array('status' => false, 'mensaje' => 'Hubo un error al guardar el cliente.');
         }
@@ -699,6 +707,21 @@ class Controlador
 
         return $dt_clientes;
     }
+    public static function mostrarClientesById()
+    {
+        $clt = Modelo::mdlMostrarClienteById($_POST['clt_id']);
+        return $clt;
+    }
+    public static function eliminarClientes()
+    {
+        $res = Modelo::mdlEliminarCliente($_POST['clt_id']);
+        if ($res) {
+            return array('status' => true, 'mensaje' => 'El cliente se elimino correctamente.');
+        } else {
+            return array('status' => false, 'mensaje' => 'Hubo un error al eliminar el cliente.');
+        }
+    }
+
 }
 
 
@@ -795,6 +818,14 @@ if (isset($_POST['btnGuardarCliente'])) {
 if (isset($_POST['btnMostrarClientes'])) {
     $mostrarClientes = new Controlador();
     echo json_encode($mostrarClientes->mostrarClientes(), true);
+}
+if (isset($_POST['btnMostrarClienteById'])) {
+    $mostrarClienteById = new Controlador();
+    echo json_encode($mostrarClienteById->mostrarClientesById(), true);
+}
+if (isset($_POST['btnEliminarCliente'])) {
+    $eliminarCliente = new Controlador();
+    echo json_encode($eliminarCliente->eliminarClientes(), true);
 }
 
 

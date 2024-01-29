@@ -5,14 +5,14 @@ if (isset($_GET['cliente'])) {
     $clt_id = $_GET['cliente'];
     $clt = Modelo::mdlMostrarClienteById($clt_id);
     $params = array(
-        'token' => 'dmvqtf79zia7pdkq',
-        'chatId' => '120363206560286108@g.us',
+        'token' => WA_TOKEN,
+        'chatId' => $clt['clt_gpo_wpp'],
         'limit' => '10'
     );
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://api.ultramsg.com/instance73569/chats/messages?" . http_build_query($params),
+        CURLOPT_URL => WA_API_URL . "chats/messages?" . http_build_query($params),
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
@@ -73,9 +73,9 @@ if (isset($_GET['cliente'])) {
             }
 
             echo 'Total de actas: ' . $totalActas . '<br>';
-            echo 'Total de rfc: ' . $totalRfc. '<br>';
+            echo 'Total de rfc: ' . $totalRfc . '<br>';
             var_dump($paquete);
-            echo 'Precio total actas: ' . $precio_total_actas. '<br>';
+            echo 'Precio total actas: ' . $precio_total_actas . '<br>';
             echo 'Precio total rfc: ' . $precio_total_rfc . '<br>';
         }
     }

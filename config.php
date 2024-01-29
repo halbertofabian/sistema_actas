@@ -16,6 +16,12 @@ define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASSWORD', '');
 
+//INSTANCIAS PARA ENVIO DE WHATSAPP
+define('WA_API_URL', 'https://api.ultramsg.com/instance73569/');
+define('WA_ID_INSTANCIA', 'instance73569');
+define('WA_TOKEN', 'dmvqtf79zia7pdkq');
+define('WA_NUMERO', '7341006945');
+
 
 
 function subirArchivoReverso($inputName)

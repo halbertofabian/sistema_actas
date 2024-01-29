@@ -237,7 +237,7 @@
                                             <div class="row">
                                                 <div class="col-12 mt-3">
                                                     <div class="table-responsive">
-                                                        <table class="table table-hover" id="data_table_servicios" style="width: 100%;">
+                                                        <table class="table table-sm table-hover" id="data_table_servicios" style="width: 100%;">
                                                             <thead class="table-dark text-center">
                                                                 <tr>
                                                                     <th scope="col">#</th>
@@ -263,7 +263,7 @@
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="table-responsive">
-                                                        <table class="table table-hover" id="data_table_servicios2" style="width: 100%;">
+                                                        <table class="table table-sm table-hover" id="data_table_servicios2" style="width: 100%;">
                                                             <thead class="table-dark text-center">
                                                                 <tr>
                                                                     <th scope="col">#</th>
@@ -300,7 +300,7 @@
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="table-responsive">
-                                                        <table class="table table-hover" id="data_table_precios" style="width: 100%;">
+                                                        <table class="table table-sm table-hover" id="data_table_precios" style="width: 100%;">
                                                             <thead class="table-dark text-center">
                                                                 <tr>
                                                                     <th scope="col">#</th>
@@ -345,6 +345,7 @@
                                             <form id="formGuardarCliente" class="row g-3">
                                                 <div class="col-12">
                                                     <label for="clt_nombre" class="form-label">Nombre</label>
+                                                    <input type="hidden" name="clt_id" id="clt_id">
                                                     <input type="text" class="form-control text-uppercase" name="clt_nombre" id="clt_nombre" placeholder="" required />
                                                 </div>
                                                 <div class="col-12">
@@ -380,7 +381,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-12">
-                                                    <button type="submit" class="btn btn-primary float-end">
+                                                    <button type="submit" id="btnGuardarCliente" class="btn btn-primary float-end">
                                                         Guardar
                                                     </button>
                                                 </div>
@@ -837,7 +838,10 @@
                 $("#btnGuardarSrv").text('Guardar');
                 //clientes
                 $('#formGuardarCliente')[0].reset();
+                $('#clt_id').val("");
+                $("#btnGuardarCliente").text('Guardar');
                 obtenerGruposWhatsapp();
+                mostrarPaquetes();
                 $("#datos_corte_wpp").val("");
                 $("#datos_corte_gpo").val("").trigger('change');
                 $(".datos_corte_wpp").addClass('d-none');
@@ -1168,11 +1172,11 @@
                 var settings = {
                     "async": true,
                     "crossDomain": true,
-                    "url": "https://api.ultramsg.com/instance73569/groups",
+                    "url": '<?= WA_API_URL ?>' + "groups",
                     "method": "GET",
                     "headers": {},
                     "data": {
-                        "token": "dmvqtf79zia7pdkq"
+                        "token": '<?= WA_TOKEN ?>'
                     }
                 }
 
@@ -1265,6 +1269,80 @@
                     ]
                 });
             }
+
+            $(document).on('click', '.btnEditarCliente', function() {
+                var clt_id = $(this).attr('clt_id');
+                var datos = new FormData();
+                datos.append('clt_id', clt_id);
+                datos.append('btnMostrarClienteById', true);
+                $.ajax({
+                    type: 'POST',
+                    url: 'controlador.php',
+                    data: datos,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        $("#clt_id").val(res.clt_id);
+                        $("#clt_nombre").val(res.clt_nombre);
+                        $("#clt_wpp").val(res.clt_wpp);
+                        $("#clt_gpo_wpp").val(res.clt_gpo_wpp).trigger('change');
+                        var clt_tipo_corte = JSON.parse(res.clt_tipo_corte);
+                        var tipo = clt_tipo_corte.tipo;
+                        var valor = clt_tipo_corte.valor;
+
+                        $("#clt_tipo_corte").val(tipo);
+                        $("#clt_paquete").val(res.clt_paquete).trigger('change');
+                        setTimeout(() => {
+                            $("#clt_tipo_corte").change();
+                            $("#datos_corte_wpp").val(valor);
+                            $("#datos_corte_gpo").val(valor).trigger('change');
+                        }, 500);
+                        $("#btnGuardarCliente").text('Actualizar');
+                    }
+                });
+            });
+
+            $(document).on('click', '.btnEliminarCliente', function() {
+                var clt_id = $(this).attr('clt_id');
+                swal({
+                    title: '¿Esta seguro de eliminar este cliente?',
+                    text: 'Esta accion no es reversible',
+                    icon: 'warning',
+                    buttons: ['No', 'Si, eliminar cliente'],
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        var datos = new FormData();
+                        datos.append('clt_id', clt_id);
+                        datos.append('btnEliminarCliente', true);
+                        $.ajax({
+                            type: 'POST',
+                            url: 'controlador.php',
+                            data: datos,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function(res) {
+                                if (res.status) {
+                                    swal({
+                                        title: '¡Bien!',
+                                        text: res.mensaje,
+                                        type: 'success',
+                                        icon: 'success'
+                                    }).then(function() {
+                                        limpiarDatos();
+                                        mostrarClientes();
+                                    });
+                                } else {
+                                    swal('Oops', res.mensaje, 'error');
+                                }
+                            }
+                        });
+                    } else {}
+                });
+
+            });
         </script>
     </body>
 
