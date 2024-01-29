@@ -60,3 +60,15 @@ function dnum($numero)
     $numero = str_replace('$', '', $numero);
     return $numero;
 }
+
+function generarCodigoNumeros($longitud)
+    {
+        $caracteres = '0123456789';
+        $codigo = '';
+
+        for ($i = 0; $i < $longitud; $i++) {
+            $codigo .= $caracteres[rand(0, strlen($caracteres) - 1)];
+        }
+
+        return $codigo;
+    }

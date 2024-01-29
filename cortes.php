@@ -4,10 +4,11 @@ require_once './modelo.php';
 if (isset($_GET['cliente'])) {
     $clt_id = $_GET['cliente'];
     $clt = Modelo::mdlMostrarClienteById($clt_id);
+    $clt_tipo_corte = json_decode($clt['clt_tipo_corte'], true);
     $params = array(
         'token' => WA_TOKEN,
         'chatId' => $clt['clt_gpo_wpp'],
-        'limit' => '10'
+        'limit' => '20'
     );
     $curl = curl_init();
 
@@ -39,8 +40,6 @@ if (isset($_GET['cliente'])) {
         } else {
             $autor = '521' . WA_NUMERO . '@c.us';
             $reversedArray = array_reverse($mensajes);
-            // var_dump($reversedArray);
-            // return;
             $servicios = Modelo::mdlMostrarServicios();
             $totalActas = 0;
             $totalRfc = 0;
@@ -73,6 +72,7 @@ if (isset($_GET['cliente'])) {
             $precio_total_rfc = 0;
             $precio_total_cfe = 0;
             $precio_total_nss = 0;
+            $sum_total = 0;
             foreach ($paquete as $key => $pqt) {
                 if ($pqt['srv_nombre'] == "ACTAS") {
                     $precio_total_actas = $totalActas * $pqt['prc_precio'];
@@ -88,15 +88,65 @@ if (isset($_GET['cliente'])) {
                 }
             }
 
-            echo 'Total de actas: ' . $totalActas . '<br>';
-            echo 'Total de rfc: ' . $totalRfc . '<br>';
-            echo 'Total de cfe: ' . $totalCfe . '<br>';
-            echo 'Total de nss: ' . $totalNss . '<br>';
-            var_dump($paquete);
-            echo 'Precio total actas: ' . $precio_total_actas . '<br>';
-            echo 'Precio total rfc: ' . $precio_total_rfc . '<br>';
-            echo 'Precio total cfe: ' . $precio_total_cfe . '<br>';
-            echo 'Precio total nss: ' . $precio_total_nss . '<br>';
+            $sum_total = $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss;
+            $referencia = generarCodigoNumeros(10);
+
+
+            $params2 = array(
+                'token' => WA_TOKEN,
+                'to' => $clt_tipo_corte['valor'],
+                'body' => "Total ACTAS: $totalActas = $$precio_total_actas
+Total RFC: $totalRfc = $$precio_total_rfc
+Total CFE: $totalCfe = $$precio_total_cfe
+Total NSS: $totalNss = $$precio_total_nss 
+
+Total: $$sum_total 
+
+Datos bancarios:
+Banco: BBVA 
+Cuenta: 3263 7876 6723 7890
+Nombre: Daniel...
+Referencia: $referencia
+                "
+            );
+            $curl2 = curl_init();
+            curl_setopt_array($curl2, array(
+                CURLOPT_URL => WA_API_URL . "messages/chat",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => http_build_query($params2),
+                CURLOPT_HTTPHEADER => array(
+                    "content-type: application/x-www-form-urlencoded"
+                ),
+            ));
+
+            $response2 = curl_exec($curl2);
+            $err2 = curl_error($curl2);
+
+            curl_close($curl2);
+
+            if ($err2) {
+                echo "cURL Error #:" . $err2;
+            } else {
+                echo $response2;
+            }
+
+            // echo 'Total de actas: ' . $totalActas . '<br>';
+            // echo 'Total de rfc: ' . $totalRfc . '<br>';
+            // echo 'Total de cfe: ' . $totalCfe . '<br>';
+            // echo 'Total de nss: ' . $totalNss . '<br>';
+            // var_dump($paquete);
+            // echo 'Precio total actas: ' . $precio_total_actas . '<br>';
+            // echo 'Precio total rfc: ' . $precio_total_rfc . '<br>';
+            // echo 'Precio total cfe: ' . $precio_total_cfe . '<br>';
+            // echo 'Precio total nss: ' . $precio_total_nss . '<br>';
+            // echo 'TOTAL: ' . $sum_total . '<br>';
         }
     }
 }
