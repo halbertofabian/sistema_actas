@@ -37,7 +37,7 @@ if (isset($_GET['cliente'])) {
         if ($mensajes === null) {
             echo "Error al decodificar la respuesta JSON.";
         } else {
-            $autor = '521' . $clt['clt_wpp'] . '@c.us';
+            $autor = '521' . WA_NUMERO . '@c.us';
             $reversedArray = array_reverse($mensajes);
             // var_dump($reversedArray);
             // return;
