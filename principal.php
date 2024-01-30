@@ -1343,6 +1343,26 @@
                 });
 
             });
+
+            $(document).on('click', '.btnGenerarCorte', function() {
+                var clt_id = $(this).attr('clt_id');
+                var datos = new FormData();
+                datos.append('clt_id', clt_id);
+                datos.append('btnGenerarCorte', true);
+                $.ajax({
+                    type: 'POST',
+                    url: 'controlador.php',
+                    data: datos,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            window.open(res.url, '_blank');
+                        }
+                    }
+                });
+            });
         </script>
     </body>
 
