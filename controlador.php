@@ -697,7 +697,7 @@ class Controlador
                 <div class="btn-group" role="group" aria-label="">
                     <button type="button" class="btn btn-warning btnEditarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fas fa-edit"></i></a>
                     <button type="button" class="btn btn-danger btnEliminarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fa fa-trash-alt"></i></button>
-                    <button type="button" class="btn btn-light btnGenerarCorte" clt_id="' . $clt['clt_id'] . '"><i class="fa fa-cash-register"></i></button>
+                    <button type="button" class="btn btn-success btnGenerarCorte" clt_id="' . $clt['clt_id'] . '"><i class="fab fa-whatsapp"></i></button>
                 </div>
                 ',
             );
