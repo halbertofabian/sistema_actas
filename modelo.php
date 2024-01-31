@@ -622,6 +622,40 @@ class Modelo
             $con = null;
         }
     }
+    public static function mdlMostrarClienteByGrupo($clt_gpo_wpp)
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_clientes_clt WHERE clt_gpo_wpp = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $clt_gpo_wpp);
+            $pps->execute();
+            return $pps->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+    public static function mdlMostrarClienteByTipo($clt_tipo_corte)
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_clientes_clt WHERE clt_tipo_corte = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $clt_tipo_corte);
+            $pps->execute();
+            return $pps->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
     public static function mdlMostrarClientes()
     {
         try {

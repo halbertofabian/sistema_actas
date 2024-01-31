@@ -672,6 +672,13 @@ class Controlador
         $_POST['clt_nombre'] = strtoupper($_POST['clt_nombre']);
         $mensaje = "";
         if ($_POST['clt_id'] == "") {
+            $grupo = Modelo::mdlMostrarClienteByGrupo($_POST['clt_gpo_wpp']);
+            $tipo = Modelo::mdlMostrarClienteByTipo($_POST['clt_tipo_corte']);
+            if ($grupo) {
+                return array('status' => false, 'mensaje' => 'Ya hay un cliente registrado con ese grupo. Intente con uno nuevo');
+            } else if ($tipo) {
+                return array('status' => false, 'mensaje' => 'Ya hay un cliente registrado con esa información de corte. Intente con uno nuevo');
+            }
             $res = Modelo::mdlGuardarClientes($_POST);
             $mensaje = 'El cliente se guardo correctamente.';
         } else {
@@ -697,7 +704,7 @@ class Controlador
                 <div class="btn-group" role="group" aria-label="">
                     <button type="button" class="btn btn-warning btnEditarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fas fa-edit"></i></a>
                     <button type="button" class="btn btn-danger btnEliminarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fa fa-trash-alt"></i></button>
-                    <button type="button" class="btn btn-success btnGenerarCorte" clt_id="' . $clt['clt_id'] . '"><i class="fab fa-whatsapp"></i></button>
+                    <button type="button" class="btn btn-success btnGenerarCorte btn-load" clt_id="' . $clt['clt_id'] . '"><i class="fab fa-whatsapp"></i></button>
                 </div>
                 ',
             );
@@ -814,31 +821,73 @@ class Controlador
                 $sum_total = $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss;
                 $referencia = generarCodigoNumeros(10);
 
-                $messageBody = "
-Total ACTAS: $totalActas = $$precio_total_actas
+                //                 $messageBody = "
+                // Total ACTAS: $totalActas = $$precio_total_actas
+                // Total RFC: $totalRfc = $$precio_total_rfc
+                // Total CFE: $totalCfe = $$precio_total_cfe
+                // Total NSS: $totalNss = $$precio_total_nss 
+
+                // Total: $$sum_total
+
+                // Datos bancarios:
+                // Banco: BBVA
+                // Cuenta: 3263 7876 6723 7890
+                // Nombre: Daniel...
+                // Referencia: $referencia
+                // ";
+
+                //                 // Número de teléfono de destino
+                //                 $destinyNumber = '+52' . $clt['clt_wpp'];
+
+                //                 // Redirige al usuario a WhatsApp con el mensaje y el enlace
+                //                 $whatsappLink = "https://wa.me/$destinyNumber?text=" . rawurlencode($messageBody);
+
+                $params2 = array(
+                    'token' => WA_TOKEN,
+                    'to' => $clt_tipo_corte['valor'],
+                    'body' => "Total ACTAS: $totalActas = $$precio_total_actas
 Total RFC: $totalRfc = $$precio_total_rfc
 Total CFE: $totalCfe = $$precio_total_cfe
 Total NSS: $totalNss = $$precio_total_nss 
 
-Total: $$sum_total
+Total: $$sum_total 
 
 Datos bancarios:
-Banco: BBVA
+Banco: BBVA 
 Cuenta: 3263 7876 6723 7890
 Nombre: Daniel...
 Referencia: $referencia
-";
+    "
+                );
+                $curl2 = curl_init();
+                curl_setopt_array($curl2, array(
+                    CURLOPT_URL => WA_API_URL . "messages/chat",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_SSL_VERIFYPEER => 0,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "POST",
+                    CURLOPT_POSTFIELDS => http_build_query($params2),
+                    CURLOPT_HTTPHEADER => array(
+                        "content-type: application/x-www-form-urlencoded"
+                    ),
+                ));
 
-                // Número de teléfono de destino
-                $destinyNumber = '+52' . $clt['clt_wpp'];
+                $response2 = curl_exec($curl2);
+                $err2 = curl_error($curl2);
 
-                // Redirige al usuario a WhatsApp con el mensaje y el enlace
-                $whatsappLink = "https://wa.me/$destinyNumber?text=" . rawurlencode($messageBody);
+                curl_close($curl2);
+
+                if ($err2) {
+                    return array('status' => false, 'mensaje' => 'Hubo un error al enviar el corte');
+                } else {
+                    return array('status' => true, 'mensaje' => 'El corte se envio correctamente a ' . $clt['clt_nombre']);
+                }
             }
         }
-
-
-        return array('status' => true, 'url' => $whatsappLink);
     }
 
     public static function extraerInformacionPedido($texto, $opciones)

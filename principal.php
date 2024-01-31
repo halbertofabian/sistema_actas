@@ -324,7 +324,14 @@
                         </div>
                         <div class="tab-pane fade" id="nav-6" role="tabpanel" aria-labelledby="nav-6-tab">
                             <div class="row">
-                                <div class="col-md-8 col-12">
+                                <div class="col-12 g-3">
+                                    <button type="button" class="btn btn-primary" id="btnGenerarCorteGral">
+                                        Generar corte
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8 col-12  g-3">
                                     <div class="table-responsive">
                                         <table class="table table-hover" id="data_table_clientes" style="width: 100%;">
                                             <thead class="table-dark">
@@ -1356,13 +1363,55 @@
                     dataType: 'json',
                     processData: false,
                     contentType: false,
+                    beforeSend: function() {
+                        startLoadButton()
+                    },
                     success: function(res) {
+                        stopLoadButton('<i class="fab fa-whatsapp"></i>');
                         if (res.status) {
-                            window.open(res.url, '_blank');
+                            swal({
+                                title: '¡Bien!',
+                                text: res.mensaje,
+                                type: 'success',
+                                icon: 'success'
+                            }).then(function() {
+                                limpiarDatos();
+                            });
+                        } else {
+                            swal('Oops', res.mensaje, 'error');
                         }
                     }
                 });
             });
+
+
+            $(document).on('click', '#btnGenerarCorteGral', function() {
+                swal({
+                    title: '¿Esta seguro de ejecutar el corte?',
+                    icon: 'warning',
+                    buttons: ['No', 'Si, ejecutar'],
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        window.open('<?= HTTP_HOST ?>cortes.php', '_blank');
+                    } else {}
+                });
+            });
+
+            function startLoadButton() {
+                $(".btn-load").attr("disabled", true);
+                $(".btn-load").html(` <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Espere...`)
+            }
+
+            function stopLoadButton(label) {
+                $(".btn-load").attr("disabled", false);
+                if (label == "") {
+                    $(".btn-load").html("ACEPTAR");
+                } else {
+                    $(".btn-load").html(label);
+                }
+            }
         </script>
     </body>
 
