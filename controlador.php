@@ -692,7 +692,7 @@ class Controlador
             $dt_aux = array(
                 'clt_id' => $clt['clt_id'],
                 'clt_nombre' => $clt['clt_nombre'],
-                'clt_gpo_wpp' => $clt['clt_gpo_wpp'],
+                'clt_gpo_wpp' => Controlador::obtenerGruposByNombre($clt['clt_gpo_wpp']),
                 'srv_acciones' => '
                 <div class="btn-group" role="group" aria-label="">
                     <button type="button" class="btn btn-warning btnEditarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fas fa-edit"></i></a>
@@ -863,6 +863,46 @@ Referencia: $referencia
             return $informacion;
         } else {
             return null; // Retorna null si no se encuentra la palabra "Pedido" en el texto.
+        }
+    }
+
+    public static function obtenerGruposByNombre($clt_gpo_wpp)
+    {
+        $params = array(
+            'token' => WA_TOKEN
+        );
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => WA_API_URL . "groups?" . http_build_query($params),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "content-type: application/x-www-form-urlencoded"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            echo "cURL Error #:" . $err;
+        } else {
+            $grupos = json_decode($response, true);
+            foreach ($grupos as $key => $gpo) {
+                if ($clt_gpo_wpp === $gpo['id']) {
+                    return $gpo['name'];
+                } else {
+                    continue;
+                }
+            }
         }
     }
 }
