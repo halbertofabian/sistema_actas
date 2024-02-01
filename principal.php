@@ -21,13 +21,13 @@
         <!-- <script src="https://cdn.datatables.net/v/bs5/dt-1.13.6/af-2.6.0/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.js"></script> -->
         <script src="<?= HTTP_HOST ?>app-assets/js/datatables.min.js"></script>
         <script src="<?= HTTP_HOST ?>app-assets/js/sweetalert.js"></script>
-        <title>Sistema para generar actas</title>
+        <title>Tramites Dany</title>
     </head>
 
     <body>
         <nav class="navbar navbar-dark bg-dark mb-3 sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand"><i class="fa fa-file-alt"></i> Sistema de actas</a>
+                <a class="navbar-brand"><i class="fa fa-file-alt"></i> Tramites Dany</a>
                 <div class="dropdown d-flex">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <?= $_SESSION['session_usr']['usr_correo'] ?>
