@@ -1191,7 +1191,7 @@
                     $("#clt_gpo_wpp").html(`<option value="">-Seleccionar-</option>`);
                     $("#datos_corte_gpo").html(`<option value="">-Seleccionar-</option>`);
                     response.forEach(gpo => {
-                        $("#clt_gpo_wpp").append(`<option value="${gpo.id}">${gpo.name}</option>`);
+                        $("#clt_gpo_wpp").append(`<option value="${gpo.id}" clt_nombre_gpo="${gpo.name}">${gpo.name}</option>`);
                         $("#datos_corte_gpo").append(`<option value="${gpo.id}">${gpo.name}</option>`);
                     });
                 });
@@ -1219,7 +1219,9 @@
 
             $('#formGuardarCliente').on('submit', function(e) {
                 e.preventDefault();
-                var datos = new FormData(this)
+                var clt_nombre_gpo = $('option:selected', $("#clt_gpo_wpp")).attr('clt_nombre_gpo');
+                var datos = new FormData(this);
+                datos.append('clt_nombre_gpo', clt_nombre_gpo);
                 datos.append('btnGuardarCliente', true);
                 $.ajax({
                     type: 'POST',

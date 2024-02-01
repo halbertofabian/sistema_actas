@@ -142,10 +142,10 @@ Referencia: $referencia
 
                     if ($err2) {
                         // echo "cURL Error #:" . $err2;
-                        array_push($array_Nosend_info, $clt['clt_nombre']);
+                        array_push($array_Nosend_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
                     } else {
                         // echo $response2;
-                        array_push($array_send_info, $clt['clt_nombre']);
+                        array_push($array_send_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
                     }
                 }
             }
@@ -228,18 +228,20 @@ Referencia: $referencia
         $body1 = "";
         $body2 = "";
 
-        foreach ($array_send_info as $key => $value) {
+        foreach ($array_send_info as $key => $clt) {
             $body1 .= "
                 <tr>
-                    <td>$value</td>
+                    <td>$clt[clt_nombre]</td>
+                    <td>$clt[clt_nombre_gpo]</td>
                     <td>$img_success</td>
                 </tr>
             ";
         }
-        foreach ($array_Nosend_info as $key => $value) {
+        foreach ($array_Nosend_info as $key => $clt) {
             $body2 .= "
                 <tr>
-                    <td>$value</td>
+                    <td>$clt[clt_nombre]</td>
+                    <td>$clt[clt_nombre_gpo]</td>
                     <td>$img_error</td>
                 </tr>
             ";
@@ -273,6 +275,7 @@ Referencia: $referencia
                     <thead>
                         <tr style="background-color:#014C50; width:100%; color:#fff;text-align: center;vertical-align:text-top; font-size:12px ">
                             <th>NOMBRE</th>
+                            <th>GRUPO</th>
                             <th>CHECK</th>
                         </tr>
                     </thead>
@@ -286,9 +289,13 @@ Referencia: $referencia
                     <thead>
                         <tr style="background-color:#014C50; width:100%; color:#fff;text-align: center;vertical-align:text-top; font-size:12px ">
                             <th>NOMBRE</th>
+                            <th>GRUPO</th>
                             <th>CHECK</th>
                         </tr>
                     </thead>
+                    <tbody>
+                        $body2
+                    </tbody>
                 </table>
             </td>
         </tr>

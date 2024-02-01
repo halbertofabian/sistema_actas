@@ -564,14 +564,15 @@ class Modelo
     {
         try {
             //code...
-            $sql = "INSERT INTO tbl_clientes_clt (clt_nombre, clt_wpp, clt_gpo_wpp, clt_tipo_corte, clt_paquete) VALUES (?,?,?,?,?)";
+            $sql = "INSERT INTO tbl_clientes_clt (clt_nombre, clt_wpp, clt_gpo_wpp, clt_nombre_gpo, clt_tipo_corte, clt_paquete) VALUES (?,?,?,?,?,?)";
             $con = Conexion::conectar();
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $clt['clt_nombre']);
             $pps->bindValue(2, $clt['clt_wpp']);
             $pps->bindValue(3, $clt['clt_gpo_wpp']);
-            $pps->bindValue(4, $clt['clt_tipo_corte']);
-            $pps->bindValue(5, $clt['clt_paquete']);
+            $pps->bindValue(4, $clt['clt_nombre_gpo']);
+            $pps->bindValue(5, $clt['clt_tipo_corte']);
+            $pps->bindValue(6, $clt['clt_paquete']);
             $pps->execute();
             return $pps->rowCount() > 0;
         } catch (PDOException $th) {
@@ -586,15 +587,16 @@ class Modelo
     {
         try {
             //code...
-            $sql = "UPDATE tbl_clientes_clt SET clt_nombre = ?, clt_wpp = ?, clt_gpo_wpp = ?, clt_tipo_corte = ?, clt_paquete = ? WHERE clt_id = ?";
+            $sql = "UPDATE tbl_clientes_clt SET clt_nombre = ?, clt_wpp = ?, clt_gpo_wpp = ?, clt_nombre_gpo = ?, clt_tipo_corte = ?, clt_paquete = ? WHERE clt_id = ?";
             $con = Conexion::conectar();
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $clt['clt_nombre']);
             $pps->bindValue(2, $clt['clt_wpp']);
             $pps->bindValue(3, $clt['clt_gpo_wpp']);
-            $pps->bindValue(4, $clt['clt_tipo_corte']);
-            $pps->bindValue(5, $clt['clt_paquete']);
-            $pps->bindValue(6, $clt['clt_id']);
+            $pps->bindValue(4, $clt['clt_nombre_gpo']);
+            $pps->bindValue(5, $clt['clt_tipo_corte']);
+            $pps->bindValue(6, $clt['clt_paquete']);
+            $pps->bindValue(7, $clt['clt_id']);
             $pps->execute();
             return $pps->rowCount() > 0;
         } catch (PDOException $th) {

@@ -699,7 +699,7 @@ class Controlador
             $dt_aux = array(
                 'clt_id' => $clt['clt_id'],
                 'clt_nombre' => $clt['clt_nombre'],
-                'clt_gpo_wpp' => Controlador::obtenerGruposByNombre($clt['clt_gpo_wpp']),
+                'clt_gpo_wpp' => $clt['clt_nombre_gpo'],
                 'srv_acciones' => '
                 <div class="btn-group" role="group" aria-label="">
                     <button type="button" class="btn btn-warning btnEditarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fas fa-edit"></i></a>
