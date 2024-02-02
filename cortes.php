@@ -58,17 +58,20 @@ class Cortes
                         // $opciones = array('ACTAS', 'RFC', 'CFE', 'NSS');
                         if ($autor == $msg['author']) {
                             $informacionPedido = Cortes::extraerInformacionPedido($msg['body'], $servicios);
-                            if ($informacionPedido !== null && isset($informacionPedido['ACTAS']) && $informacionPedido['ACTAS'] != "") {
-                                $totalActas += intval($informacionPedido['ACTAS']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['RFC']) && $informacionPedido['RFC'] != "") {
-                                $totalRfc += intval($informacionPedido['RFC']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['CFE']) && $informacionPedido['CFE'] != "") {
-                                $totalCfe += intval($informacionPedido['CFE']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['NSS']) && $informacionPedido['NSS'] != "") {
-                                $totalNss += intval($informacionPedido['NSS']);
+                            if ($informacionPedido !== null) {
+                                if ($informacionPedido !== null && isset($informacionPedido['ACTAS']) && $informacionPedido['ACTAS'] != "") {
+                                    $totalActas += intval($informacionPedido['ACTAS']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['RFC']) && $informacionPedido['RFC'] != "") {
+                                    $totalRfc += intval($informacionPedido['RFC']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['CFE']) && $informacionPedido['CFE'] != "") {
+                                    $totalCfe += intval($informacionPedido['CFE']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['NSS']) && $informacionPedido['NSS'] != "") {
+                                    $totalNss += intval($informacionPedido['NSS']);
+                                }
+                                break;
                             }
                         } else {
                             continue;
