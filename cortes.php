@@ -159,7 +159,7 @@ Referencia: $referencia
     public function extraerInformacionPedido($texto, $opciones)
     {
         // Buscar la palabra "Pedido" y extraer información
-        if (strpos($texto, 'Pedido') !== false || strpos($texto, 'PEDIDO') !== false || strpos($texto, 'pedido') !== false) {
+        if (strpos($texto, 'Conteo') !== false || strpos($texto, 'CONTEO') !== false || strpos($texto, 'conteo') !== false) {
             $informacion = array();
 
             foreach ($opciones as $opcion) {
