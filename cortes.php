@@ -6,144 +6,147 @@ class Cortes
 {
     public function generarCortes()
     {
-        $clientes = Modelo::mdlMostrarClientes();
-        $array_send_info = array();
-        $array_Nosend_info = array();
-        $countSend = 0;
-        $countNoSend = 0;
-        foreach ($clientes as $key => $clt) {
-            # code...
-            $clt_tipo_corte = json_decode($clt['clt_tipo_corte'], true);
-            $params = array(
-                'token' => WA_TOKEN,
-                'chatId' => $clt['clt_gpo_wpp'],
-                'limit' => '10'
-            );
-            $curl = curl_init();
+        if (isset($_GET['clientes'])) {
+            // $clientes = Modelo::mdlMostrarClientes();
+            $clientes = explode(',', $_GET['clientes']);;
+            $array_send_info = array();
+            $array_Nosend_info = array();
+            $countSend = 0;
+            $countNoSend = 0;
+            foreach ($clientes as $key => $cliente) {
+                $clt = Modelo::mdlMostrarClienteById($cliente);
+                # code...
+                $clt_tipo_corte = json_decode($clt['clt_tipo_corte'], true);
+                $params = array(
+                    'token' => WA_TOKEN,
+                    'chatId' => $clt['clt_gpo_wpp'],
+                    'limit' => '10'
+                );
+                $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => WA_API_URL . "chats/messages?" . http_build_query($params),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_HTTPHEADER => array(
-                    "content-type: application/x-www-form-urlencoded"
-                ),
-            ));
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => WA_API_URL . "chats/messages?" . http_build_query($params),
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_HTTPHEADER => array(
+                        "content-type: application/x-www-form-urlencoded"
+                    ),
+                ));
 
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
 
-            curl_close($curl);
+                curl_close($curl);
 
-            if ($err) {
-                echo "CURL Error #:" . $err;
-            } else {
-                $mensajes = json_decode($response, true);
-                if ($mensajes === null) {
-                    echo "Error al decodificar la respuesta JSON.";
+                if ($err) {
+                    echo "CURL Error #:" . $err;
                 } else {
-                    $autor = '521' . WA_NUMERO . '@c.us';
-                    $reversedArray = array_reverse($mensajes);
-                    $servicios = Modelo::mdlMostrarServicios();
-                    $totalActas = 0;
-                    $totalRfc = 0;
-                    $totalCfe = 0;
-                    $totalNss = 0;
-                    $totalCurp = 0;
-                    $totalSusRet = 0;
-                    $totalEdoInfo = 0;
-                    $sum_total = 0;
-                    $saldo = 0;
-                    $mensaje_saldo = "";
-                    foreach ($reversedArray as $key => $msg) {
-                        // $opciones = array('ACTAS', 'RFC', 'CFE', 'NSS');
-                        $informacionPedido = Cortes::extraerInformacionPedido($msg['body'], $servicios);
-                        if ($informacionPedido !== null) {
-                            if ($informacionPedido !== null && isset($informacionPedido['ACTAS']) && $informacionPedido['ACTAS'] != "") {
-                                $totalActas += intval($informacionPedido['ACTAS']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['RFC']) && $informacionPedido['RFC'] != "") {
-                                $totalRfc += intval($informacionPedido['RFC']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['CFE']) && $informacionPedido['CFE'] != "") {
-                                $totalCfe += intval($informacionPedido['CFE']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['NSS']) && $informacionPedido['NSS'] != "") {
-                                $totalNss += intval($informacionPedido['NSS']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['CURP']) && $informacionPedido['CURP'] != "") {
-                                $totalCurp += intval($informacionPedido['CURP']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['SUS/RET']) && $informacionPedido['SUS/RET'] != "") {
-                                $totalSusRet += intval($informacionPedido['SUS/RET']);
-                            }
-                            if ($informacionPedido !== null && isset($informacionPedido['EDO INFO']) && $informacionPedido['EDO INFO'] != "") {
-                                $totalEdoInfo += intval($informacionPedido['EDO INFO']);
-                            }
-                            if ($informacionPedido !== null && $informacionPedido['TipoSaldo'] !== null && $informacionPedido['Saldo'] !== null) {
-                                $tipoSaldo = $informacionPedido['TipoSaldo'];
-                                $saldo = $informacionPedido['Saldo'];
-
-                                if ($tipoSaldo === 'A favor') {
-                                    $sum_total -= $saldo;
-                                    $mensaje_saldo = "Saldo a favor: $$saldo";
-                                } else if ($tipoSaldo === 'En contra') {
-                                    $sum_total += $saldo;
-                                    $mensaje_saldo = "Saldo pendiente: $$saldo";
+                    $mensajes = json_decode($response, true);
+                    if ($mensajes === null) {
+                        echo "Error al decodificar la respuesta JSON.";
+                    } else {
+                        $autor = '521' . WA_NUMERO . '@c.us';
+                        $reversedArray = array_reverse($mensajes);
+                        $servicios = Modelo::mdlMostrarServicios();
+                        $totalActas = 0;
+                        $totalRfc = 0;
+                        $totalCfe = 0;
+                        $totalNss = 0;
+                        $totalCurp = 0;
+                        $totalSusRet = 0;
+                        $totalEdoInfo = 0;
+                        $sum_total = 0;
+                        $saldo = 0;
+                        $mensaje_saldo = "";
+                        foreach ($reversedArray as $key => $msg) {
+                            // $opciones = array('ACTAS', 'RFC', 'CFE', 'NSS');
+                            $informacionPedido = Cortes::extraerInformacionPedido($msg['body'], $servicios);
+                            if ($informacionPedido !== null) {
+                                if ($informacionPedido !== null && isset($informacionPedido['ACTAS']) && $informacionPedido['ACTAS'] != "") {
+                                    $totalActas += intval($informacionPedido['ACTAS']);
                                 }
+                                if ($informacionPedido !== null && isset($informacionPedido['RFC']) && $informacionPedido['RFC'] != "") {
+                                    $totalRfc += intval($informacionPedido['RFC']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['CFE']) && $informacionPedido['CFE'] != "") {
+                                    $totalCfe += intval($informacionPedido['CFE']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['NSS']) && $informacionPedido['NSS'] != "") {
+                                    $totalNss += intval($informacionPedido['NSS']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['CURP']) && $informacionPedido['CURP'] != "") {
+                                    $totalCurp += intval($informacionPedido['CURP']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['SUS/RET']) && $informacionPedido['SUS/RET'] != "") {
+                                    $totalSusRet += intval($informacionPedido['SUS/RET']);
+                                }
+                                if ($informacionPedido !== null && isset($informacionPedido['EDO INFO']) && $informacionPedido['EDO INFO'] != "") {
+                                    $totalEdoInfo += intval($informacionPedido['EDO INFO']);
+                                }
+                                if ($informacionPedido !== null && $informacionPedido['TipoSaldo'] !== null && $informacionPedido['Saldo'] !== null) {
+                                    $tipoSaldo = $informacionPedido['TipoSaldo'];
+                                    $saldo = $informacionPedido['Saldo'];
+
+                                    if ($tipoSaldo === 'A favor') {
+                                        $sum_total -= $saldo;
+                                        $mensaje_saldo = "Saldo a favor: $$saldo";
+                                    } else if ($tipoSaldo === 'En contra') {
+                                        $sum_total += $saldo;
+                                        $mensaje_saldo = "Saldo pendiente: $$saldo";
+                                    }
+                                }
+                                break;
+                            } else {
+                                continue;
                             }
-                            break;
-                        } else {
-                            continue;
                         }
-                    }
 
-                    $paquete = Modelo::mdlMostrarPreciosByPaquete($clt['clt_paquete']);
+                        $paquete = Modelo::mdlMostrarPreciosByPaquete($clt['clt_paquete']);
 
-                    $precio_total_actas = 0;
-                    $precio_total_rfc = 0;
-                    $precio_total_cfe = 0;
-                    $precio_total_nss = 0;
-                    $precio_total_curp = 0;
-                    $precio_total_susret = 0;
-                    $precio_total_edoinfo = 0;
-                    foreach ($paquete as $key => $pqt) {
-                        if ($pqt['srv_nombre'] == "ACTAS") {
-                            $precio_total_actas = $totalActas * $pqt['prc_precio'];
+                        $precio_total_actas = 0;
+                        $precio_total_rfc = 0;
+                        $precio_total_cfe = 0;
+                        $precio_total_nss = 0;
+                        $precio_total_curp = 0;
+                        $precio_total_susret = 0;
+                        $precio_total_edoinfo = 0;
+                        foreach ($paquete as $key => $pqt) {
+                            if ($pqt['srv_nombre'] == "ACTAS") {
+                                $precio_total_actas = $totalActas * $pqt['prc_precio'];
+                            }
+                            if ($pqt['srv_nombre'] == "RFC") {
+                                $precio_total_rfc = $totalRfc * $pqt['prc_precio'];
+                            }
+                            if ($pqt['srv_nombre'] == "CFE") {
+                                $precio_total_cfe = $totalCfe * $pqt['prc_precio'];
+                            }
+                            if ($pqt['srv_nombre'] == "NSS") {
+                                $precio_total_nss = $totalNss * $pqt['prc_precio'];
+                            }
+                            if ($pqt['srv_nombre'] == "CURP") {
+                                $precio_total_curp = $totalCurp * $pqt['prc_precio'];
+                            }
+                            if ($pqt['srv_nombre'] == "SUS/RET") {
+                                $precio_total_susret = $totalSusRet * $pqt['prc_precio'];
+                            }
+                            if ($pqt['srv_nombre'] == "EDO INFO") {
+                                $precio_total_edoinfo = $totalEdoInfo * $pqt['prc_precio'];
+                            }
                         }
-                        if ($pqt['srv_nombre'] == "RFC") {
-                            $precio_total_rfc = $totalRfc * $pqt['prc_precio'];
-                        }
-                        if ($pqt['srv_nombre'] == "CFE") {
-                            $precio_total_cfe = $totalCfe * $pqt['prc_precio'];
-                        }
-                        if ($pqt['srv_nombre'] == "NSS") {
-                            $precio_total_nss = $totalNss * $pqt['prc_precio'];
-                        }
-                        if ($pqt['srv_nombre'] == "CURP") {
-                            $precio_total_curp = $totalCurp * $pqt['prc_precio'];
-                        }
-                        if ($pqt['srv_nombre'] == "SUS/RET") {
-                            $precio_total_susret = $totalSusRet * $pqt['prc_precio'];
-                        }
-                        if ($pqt['srv_nombre'] == "EDO INFO") {
-                            $precio_total_edoinfo = $totalEdoInfo * $pqt['prc_precio'];
-                        }
-                    }
 
-                    $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo;
-                    $referencia = generarCodigoNumeros(5);
+                        $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo;
+                        $referencia = generarCodigoNumeros(5);
 
 
-                    $mensaje1 = array(
-                        'token' => WA_TOKEN,
-                        'to' => $clt_tipo_corte['valor'],
-                        'body' => "Buenos días, esperamos y se encuentren bien, el día de hoy hacemos corte, apóyenos en verificar si su corte está bien, esperamos su depósito, gracias por su preferencia. 🖥️❗️❗️
+                        $mensaje1 = array(
+                            'token' => WA_TOKEN,
+                            'to' => $clt_tipo_corte['valor'],
+                            'body' => "Buenos días, esperamos y se encuentren bien, el día de hoy hacemos corte, apóyenos en verificar si su corte está bien, esperamos su depósito, gracias por su preferencia. 🖥️❗️❗️
 Favor de ingresar la siguiente *Referencia* a la hora de hacer su pago: *$referencia*
 
 Total ACTAS: $totalActas = $$precio_total_actas
@@ -159,18 +162,18 @@ $mensaje_saldo
 Total: $$sum_total
 
 Apóyenos en generar su pago antes de terminar el día. ¡Muchas gracias! 🎇"
-                    );
-                    if ($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0) {
-                        continue;
-                    }
-                    $response1 = Cortes::enviarMensaje($mensaje1);
+                        );
+                        if ($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0) {
+                            continue;
+                        }
+                        $response1 = Cortes::enviarMensaje($mensaje1);
 
-                    if ($response1['status']) {
-                        // Si el primer mensaje se envió correctamente, envías el segundo mensaje
-                        $mensaje2 = array(
-                            'token' => WA_TOKEN,
-                            'to' => $clt_tipo_corte['valor'],
-                            'body' => "FORMAS DE PAGO ⚠️
+                        if ($response1['status']) {
+                            // Si el primer mensaje se envió correctamente, envías el segundo mensaje
+                            $mensaje2 = array(
+                                'token' => WA_TOKEN,
+                                'to' => $clt_tipo_corte['valor'],
+                                'body' => "FORMAS DE PAGO ⚠️
 
 *REFERENCIA $referencia*
 
@@ -189,21 +192,22 @@ DEPÓSITOS OXXO SPIN
 TARJETA: 4217-4700-5566-8236
 BENEFICIARIO: Fernando Daniel Romo.
 BANCO: 🏦 STP"
-                        );
-                        $response2 = Cortes::enviarMensaje($mensaje2);
+                            );
+                            $response2 = Cortes::enviarMensaje($mensaje2);
 
-                        if ($response2['status']) {
-                            array_push($array_send_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
+                            if ($response2['status']) {
+                                array_push($array_send_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
+                            } else {
+                                array_push($array_Nosend_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
+                            }
                         } else {
                             array_push($array_Nosend_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
                         }
-                    } else {
-                        array_push($array_Nosend_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
                     }
                 }
             }
+            Cortes::imprimirReporte($array_send_info, $array_Nosend_info);
         }
-        Cortes::imprimirReporte($array_send_info, $array_Nosend_info);
     }
 
     public function extraerInformacionPedido($texto, $opciones)

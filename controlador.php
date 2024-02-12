@@ -697,6 +697,12 @@ class Controlador
         $clientes = Modelo::mdlMostrarClientes();
         foreach ($clientes as $key => $clt) {
             $dt_aux = array(
+                'inputs' => '<div class="form-check">
+                <input class="form-check-input contadorClt" type="checkbox" name="cltSelect[]" value="'.$clt['clt_id'].'" id="'.$clt['clt_id'].'">
+                <label class="form-check-label" for="'.$clt['clt_id'].'">
+                  Seleccionar
+                </label>
+              </div>',
                 'clt_id' => $clt['clt_id'],
                 'clt_nombre' => $clt['clt_nombre'],
                 'clt_gpo_wpp' => $clt['clt_nombre_gpo'],
@@ -902,8 +908,8 @@ Total: $$sum_total
 
 Apóyenos en generar su pago antes de terminar el día. ¡Muchas gracias! 🎇"
                 );
-                if($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0){
-                    return array('status' => true, 'mensaje' => 'No se envio mensaje a ' . $clt['clt_nombre']. ' ya que no hay nada en conteo');
+                if ($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0) {
+                    return array('status' => true, 'mensaje' => 'No se envio mensaje a ' . $clt['clt_nombre'] . ' ya que no hay nada en conteo');
                 }
                 $response1 = Controlador::enviarMensaje($mensaje1);
 

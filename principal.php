@@ -336,6 +336,14 @@
                                         <table class="table table-hover" id="data_table_clientes" style="width: 100%;">
                                             <thead class="table-dark">
                                                 <tr>
+                                                    <th colspan="5" class="text-center">Seleccionados: <span id="contadorClt">0</span></th>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">
+                                                        <button type="button" id="btnDesmarcar" class="btn btn-link btn-sm">
+                                                            Desmarcar
+                                                        </button>
+                                                    </th>
                                                     <th scope="col">#</th>
                                                     <th scope="col">NOMBRE</th>
                                                     <th scope="col">GRUPO</th>
@@ -1264,6 +1272,9 @@
                     'ordering': false,
                     order: false,
                     'columns': [{
+                            'data': 'inputs'
+                        },
+                        {
                             'data': 'clt_id'
                         },
                         {
@@ -1388,17 +1399,39 @@
 
 
             $(document).on('click', '#btnGenerarCorteGral', function() {
+                var contador = $('#contadorClt').text();
                 swal({
-                    title: '¿Esta seguro de ejecutar el corte?',
+                    title: '¿Esta seguro de ejecutar el corte para ' + contador + ' clientes seleccionados?',
                     icon: 'warning',
                     buttons: ['No', 'Si, ejecutar'],
                     dangerMode: true,
                 }).then((willDelete) => {
                     if (willDelete) {
-                        window.open('<?= HTTP_HOST ?>cortes.php', '_blank');
+                        var clientesSeleccionados = [];
+                        $('input[name="cltSelect[]"]:checked').each(function() {
+                            clientesSeleccionados.push($(this).val());
+                        });
+                        // Redirigir a la otra página PHP pasando los clientes seleccionados como parámetro en la URL
+                        // window.location.href = 'otra_pagina.php?clientes=' + clientesSeleccionados.join(',');
+                        window.open('<?= HTTP_HOST ?>cortes.php?clientes=' + clientesSeleccionados.join(','), '_blank');
                     } else {}
                 });
             });
+
+            function actualizarContador() {
+                var seleccionados = $('input[name="cltSelect[]"]:checked').length;
+                $('#contadorClt').text(seleccionados);
+            }
+
+            $(document).on('change', '.contadorClt', function() {
+                actualizarContador();
+            });
+
+            $('#btnDesmarcar').click(function() {
+                $('input[name="cltSelect[]"]').prop('checked', false);
+                actualizarContador();
+            });
+
 
             function startLoadButton() {
                 $(".btn-load").attr("disabled", true);
