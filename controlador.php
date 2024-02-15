@@ -542,6 +542,15 @@ class Controlador
                 );
             }
             $res = Modelo::mdlAgregarServicio($_POST);
+            $paquetes = Modelo::mdlMostrarPaquetes();
+            foreach ($paquetes as $key => $pqt) {
+                $datos = array(
+                    'prc_id_srv' => $res,
+                    'prc_id_pqt' => $pqt['pqt_id'],
+                    'prc_precio' => 0,
+                );
+                Modelo::mdlAgregarPrecios($datos);
+            }
         } else {
             $res = Modelo::mdlActualizarServicio($_POST);
         }
@@ -864,7 +873,7 @@ class Controlador
                 }
 
                 $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo;
-                $referencia = generarCodigoNumeros(5);
+                $referencia = generarCodigoNumeros(6);
 
                 //                 $messageBody = "
                 // Total ACTAS: $totalActas = $$precio_total_actas

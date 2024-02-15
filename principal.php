@@ -1411,9 +1411,15 @@
                         $('input[name="cltSelect[]"]:checked').each(function() {
                             clientesSeleccionados.push($(this).val());
                         });
+
+                        if(clientesSeleccionados.length == 0){
+                            swal('Oops', 'Todavia no tiene cliente seleccionados para el corte', 'error');
+                            return false;
+                        }
+
                         // Redirigir a la otra página PHP pasando los clientes seleccionados como parámetro en la URL
                         // window.location.href = 'otra_pagina.php?clientes=' + clientesSeleccionados.join(',');
-                        window.open('<?= HTTP_HOST ?>cortes.php?clientes=' + clientesSeleccionados.join(','), '_blank');
+                        window.open('<?= HTTP_HOST ?>cortes.php?clientes=' + btoa(clientesSeleccionados.join(',')), '_blank');
                     } else {}
                 });
             });

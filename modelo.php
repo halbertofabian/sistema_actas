@@ -354,7 +354,8 @@ class Modelo
             $pps = $con->prepare($sql);
             $pps->bindValue(1, $srv['srv_nombre']);
             $pps->execute();
-            return $pps->rowCount() > 0;
+            return $con->lastInsertId();
+            // return $pps->rowCount() > 0;
         } catch (PDOException $th) {
             //throw $th;
         } finally {

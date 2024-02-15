@@ -8,7 +8,8 @@ class Cortes
     {
         if (isset($_GET['clientes'])) {
             // $clientes = Modelo::mdlMostrarClientes();
-            $clientes = explode(',', $_GET['clientes']);;
+            $clientesDecodificados = base64_decode($_GET['clientes']);
+            $clientes = explode(',', $clientesDecodificados);
             $array_send_info = array();
             $array_Nosend_info = array();
             $countSend = 0;
@@ -140,7 +141,7 @@ class Cortes
                         }
 
                         $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo;
-                        $referencia = generarCodigoNumeros(5);
+                        $referencia = generarCodigoNumeros(6);
 
 
                         $mensaje1 = array(
@@ -196,7 +197,20 @@ BANCO: 🏦 STP"
                             $response2 = Cortes::enviarMensaje($mensaje2);
 
                             if ($response2['status']) {
-                                array_push($array_send_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
+                                array_push($array_send_info, array(
+                                    'clt_nombre' => $clt['clt_nombre'],
+                                    'clt_nombre_gpo' => $clt['clt_nombre_gpo'],
+                                    'clt_tramites' => "
+                                        ACTAS: $totalActas = $$precio_total_actas\r 
+                                        RFC: $totalRfc = $$precio_total_rfc\r
+                                        CFE: $totalCfe = $$precio_total_cfe\r
+                                        NSS: $totalNss = $$precio_total_nss\r
+                                        CURP: $totalCurp = $$precio_total_curp\r
+                                        SUS/RET: $totalSusRet = $$precio_total_susret\r 
+                                        EDO INFO: $totalEdoInfo = $$precio_total_edoinfo",
+                                    'clt_saldo' => $mensaje_saldo,
+                                    'clt_total' => "$" . $sum_total
+                                ));
                             } else {
                                 array_push($array_Nosend_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
                             }
@@ -335,19 +349,21 @@ BANCO: 🏦 STP"
         $pdf->AddPage('P');
 
         $logo = HTTP_HOST . '/app-assets/imagenes/logo-dany.jpg';
-        $img_success = '<img src="' . HTTP_HOST . '/app-assets/imagenes/v_1.png" width="20" />';
-        $img_error = '<img src="' . HTTP_HOST . '/app-assets/imagenes/v_0.png" width="20" />';
         $fecha_corte = date('d-m-Y');
 
         $body1 = "";
         $body2 = "";
 
+        $total_general = 0;
         foreach ($array_send_info as $key => $clt) {
+            $total_general += dnum($clt['clt_total']);
             $body1 .= "
                 <tr>
-                    <td>$clt[clt_nombre]</td>
-                    <td>$clt[clt_nombre_gpo]</td>
-                    <td>$img_success</td>
+                    <td style='vertical-align: middle;'>$clt[clt_nombre]</td>
+                    <td style='vertical-align: middle;'>$clt[clt_nombre_gpo]</td>
+                    <td>" . nl2br($clt['clt_tramites']) . "</td>
+                    <td style='vertical-align: middle;'>$clt[clt_saldo]</td>
+                    <td style='vertical-align: middle;'>$clt[clt_total]</td>
                 </tr>
             ";
         }
@@ -356,13 +372,12 @@ BANCO: 🏦 STP"
                 <tr>
                     <td>$clt[clt_nombre]</td>
                     <td>$clt[clt_nombre_gpo]</td>
-                    <td>$img_error</td>
                 </tr>
             ";
         }
 
         $header = <<<EOF
-<table cellspacing="0" cellpadding="0">
+    <table cellspacing="0" cellpadding="0">
         <tr>
             <td style="text-align: left; width:30%;">
                 <img src="$logo" width="120" /><br>
@@ -384,27 +399,40 @@ BANCO: 🏦 STP"
         <br>
         <br>
         <tr>
-            <td style="width:50%;">
+            <td style="width:70%;">
                 <table style="width:100%; text-align: center;" border="1">
                     <thead>
+                        <tr>
+                            <th colspan="5" style="background-color:#014C50; width:100%; color:#fff;text-align: center;vertical-align:text-top; font-size:12px;">CORTES ENVIADOS :)</th>
+                        </tr>
                         <tr style="background-color:#014C50; width:100%; color:#fff;text-align: center;vertical-align:text-top; font-size:12px ">
                             <th>NOMBRE</th>
                             <th>GRUPO</th>
-                            <th>CHECK</th>
+                            <th>TRAMITES</th>
+                            <th>SALDO</th>
+                            <th>TOTAL</th>
                         </tr>
                     </thead>
                     <tbody>
                         $body1
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" style="background-color:#014C50; color:#fff;text-align: right;vertical-align:text-top; font-size:12px;">TOTAL</td>
+                            <td style="background-color:#014C50; color:#fff;text-align: center;vertical-align:text-top; font-size:12px;">$$total_general</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </td>
-            <td style="width:50%;">
+            <td style="width:30%;">
                 <table style="width:100%;" border="1">
                     <thead>
+                        <tr>
+                            <th colspan="2" style="background-color:#014C50; width:100%; color:#fff;text-align: center;vertical-align:text-top; font-size:12px;">CORTES NO ENVIADOS :(</th>
+                        </tr>
                         <tr style="background-color:#014C50; width:100%; color:#fff;text-align: center;vertical-align:text-top; font-size:12px ">
                             <th>NOMBRE</th>
                             <th>GRUPO</th>
-                            <th>CHECK</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -413,7 +441,7 @@ BANCO: 🏦 STP"
                 </table>
             </td>
         </tr>
-</table>
+    </table>
 
 EOF;
         // Print text using writeHTMLCell()
