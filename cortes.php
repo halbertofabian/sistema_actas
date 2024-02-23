@@ -211,6 +211,7 @@ BANCO: 🏦 STP"
                                     'clt_saldo' => $mensaje_saldo,
                                     'clt_total' => "$" . $sum_total
                                 ));
+                                Modelo::mdlActualizarEstadoEnvioCliente(1, $clt['clt_id']);
                             } else {
                                 array_push($array_Nosend_info, array('clt_nombre' => $clt['clt_nombre'], 'clt_nombre_gpo' => $clt['clt_nombre_gpo']));
                             }

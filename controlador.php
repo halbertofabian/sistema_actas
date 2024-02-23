@@ -705,16 +705,18 @@ class Controlador
         $dt_clientes = array();
         $clientes = Modelo::mdlMostrarClientes();
         foreach ($clientes as $key => $clt) {
+            $disabled = ($clt['clt_estado_enviado'] == 1) ? "disabled" : "";
             $dt_aux = array(
                 'inputs' => '<div class="form-check">
-                <input class="form-check-input contadorClt" type="checkbox" name="cltSelect[]" value="'.$clt['clt_id'].'" id="'.$clt['clt_id'].'">
-                <label class="form-check-label" for="'.$clt['clt_id'].'">
+                <input ' . $disabled . ' class="form-check-input contadorClt" type="checkbox" name="cltSelect[]" value="' . $clt['clt_id'] . '" id="' . $clt['clt_id'] . ' readonly">
+                <label class="form-check-label" for="' . $clt['clt_id'] . '">
                   Seleccionar
                 </label>
               </div>',
                 'clt_id' => $clt['clt_id'],
                 'clt_nombre' => $clt['clt_nombre'],
                 'clt_gpo_wpp' => $clt['clt_nombre_gpo'],
+                'clt_estado_enviado' => $clt['clt_estado_enviado'] == 1 ? '<span class="text-success"><i class="fa fa-check"></i> Enviado</span>' : '<span class="text-dark"><i class="fa fa-clock"></i> Pendiente</span>',
                 'srv_acciones' => '
                 <div class="btn-group" role="group" aria-label="">
                     <button type="button" class="btn btn-warning btnEditarCliente" clt_id="' . $clt['clt_id'] . '"><i class="fas fa-edit"></i></a>
@@ -1081,6 +1083,19 @@ BANCO: 🏦 STP"
             }
         }
     }
+
+    public static function restablecerCortesClientes()
+    {
+        $clientes = Modelo::mdlMostrarClientesCortesEnviados();
+        $contador = 0;
+        foreach ($clientes as $key => $clt) {
+            $res = Modelo::mdlActualizarEstadoEnvioCliente(0, $clt['clt_id']);
+            if ($res) {
+                $contador++;
+            }
+        }
+        return array('status' => true, 'mensaje' => 'Se restablecieron ' . $contador . ' clientes');
+    }
 }
 
 
@@ -1189,6 +1204,10 @@ if (isset($_POST['btnEliminarCliente'])) {
 if (isset($_POST['btnGenerarCorte'])) {
     $generarCorte = new Controlador();
     echo json_encode($generarCorte->generarCorte(), true);
+}
+if (isset($_POST['btnResetarCortes'])) {
+    $restablecerCortes = new Controlador();
+    echo json_encode($restablecerCortes->restablecerCortesClientes(), true);
 }
 
 

@@ -692,4 +692,39 @@ class Modelo
             $con = null;
         }
     }
+    public static function mdlMostrarClientesCortesEnviados()
+    {
+        try {
+            //code...
+            $sql = "SELECT * FROM tbl_clientes_clt WHERE clt_estado_enviado = 1 ORDER BY clt_id DESC";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->execute();
+            return $pps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
+
+    public static function mdlActualizarEstadoEnvioCliente($clt_estado_enviado, $clt_id)
+    {
+        try {
+            //code...
+            $sql = "UPDATE tbl_clientes_clt SET clt_estado_enviado = ? WHERE clt_id = ?";
+            $con = Conexion::conectar();
+            $pps = $con->prepare($sql);
+            $pps->bindValue(1, $clt_estado_enviado);
+            $pps->bindValue(2, $clt_id);
+            $pps->execute();
+            return $pps->rowCount() > 0;
+        } catch (PDOException $th) {
+            //throw $th;
+        } finally {
+            $pps = null;
+            $con = null;
+        }
+    }
 }

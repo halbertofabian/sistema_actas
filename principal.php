@@ -324,10 +324,13 @@
                         </div>
                         <div class="tab-pane fade" id="nav-6" role="tabpanel" aria-labelledby="nav-6-tab">
                             <div class="row">
-                                <div class="col-12 g-3">
-                                    <button type="button" class="btn btn-primary" id="btnGenerarCorteGral">
-                                        Generar corte
-                                    </button>
+                                <div class="col-xl-8 col-md-10 col-12 g-3">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="clt_count" min="1" placeholder="Introduce la cantidad de clientes" aria-describedby="btnGenerarCorteGral">
+                                        <button class="btn btn-dark" type="button" id="btnSeleccionarClientes"><i class="fa fa-check"></i> Selecionar clientes</button>
+                                        <button class="btn btn-primary" type="button" id="btnGenerarCorteGral"><i class="fa fa-file-alt"></i> Generar corte</button>
+                                        <button class="btn btn-danger" type="button" id="btnResetearDatos"><i class="fa fa-sync"></i> Restablecer cortes</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
@@ -336,7 +339,7 @@
                                         <table class="table table-hover" id="data_table_clientes" style="width: 100%;">
                                             <thead class="table-dark">
                                                 <tr>
-                                                    <th colspan="5" class="text-center">Seleccionados: <span id="contadorClt">0</span></th>
+                                                    <th colspan="6" class="text-center">Seleccionados: <span id="contadorClt">0</span></th>
                                                 </tr>
                                                 <tr>
                                                     <th scope="col">
@@ -347,6 +350,7 @@
                                                     <th scope="col">#</th>
                                                     <th scope="col">NOMBRE</th>
                                                     <th scope="col">GRUPO</th>
+                                                    <th scope="col">ESTADO</th>
                                                     <th scope="col">ACCIONES</th>
                                                 </tr>
                                             </thead>
@@ -1284,6 +1288,9 @@
                             'data': 'clt_gpo_wpp'
                         },
                         {
+                            'data': 'clt_estado_enviado'
+                        },
+                        {
                             'data': 'srv_acciones'
                         },
                     ]
@@ -1408,18 +1415,78 @@
                 }).then((willDelete) => {
                     if (willDelete) {
                         var clientesSeleccionados = [];
-                        $('input[name="cltSelect[]"]:checked').each(function() {
+                        $('input[name="cltSelect[]"]:enabled:checked').each(function() {
                             clientesSeleccionados.push($(this).val());
                         });
 
-                        if(clientesSeleccionados.length == 0){
+                        console.log(clientesSeleccionados)
+
+                        if (clientesSeleccionados.length == 0) {
                             swal('Oops', 'Todavia no tiene cliente seleccionados para el corte', 'error');
                             return false;
                         }
-
-                        // Redirigir a la otra página PHP pasando los clientes seleccionados como parámetro en la URL
-                        // window.location.href = 'otra_pagina.php?clientes=' + clientesSeleccionados.join(',');
                         window.open('<?= HTTP_HOST ?>cortes.php?clientes=' + btoa(clientesSeleccionados.join(',')), '_blank');
+
+                        swal({
+                            title: '¡Bien!',
+                            text: 'Por favor de click en el boton de OK una vez que se halla generado tu reporte de corte, esto para actualizar la información',
+                            type: 'success',
+                            icon: 'success'
+                        }).then(function() {
+                            $("#clt_count").val("");
+                            $('#contadorClt').text(0)
+                            mostrarClientes();
+                        });
+                    } else {}
+                });
+            });
+
+            $(document).on('click', '#btnSeleccionarClientes', function() {
+                var clt_count = $("#clt_count").val();
+                if (clt_count <= 0) {
+                    swal('Oops', 'Todavia no tiene cliente seleccionados para el corte', 'error');
+                    return false;
+                }
+                $('#data_table_clientes input[type="checkbox"]').prop('checked', false);
+                $('#data_table_clientes input[type="checkbox"]').filter(function() {
+                    return !$(this).is(':disabled');
+                }).slice(0, clt_count).prop('checked', true);
+                var count = $('input[name="cltSelect[]"]:enabled:checked').length;
+                $('#contadorClt').text(count);
+            });
+
+            $('#btnResetearDatos').on('click', function() {
+                swal({
+                    title: '¿Esta seguro de restablecer los cortes enviados',
+                    text: 'Esta accion no es reversible',
+                    icon: 'warning',
+                    buttons: ['No', 'Si, restablecer'],
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        var datos = new FormData();
+                        datos.append('btnResetarCortes', true);
+                        $.ajax({
+                            type: 'POST',
+                            url: 'controlador.php',
+                            data: datos,
+                            dataType: 'json',
+                            processData: false,
+                            contentType: false,
+                            success: function(res) {
+                                if (res.status) {
+                                    swal({
+                                        title: '¡Bien!',
+                                        text: res.mensaje,
+                                        type: 'success',
+                                        icon: 'success'
+                                    }).then(function() {
+                                        mostrarClientes();
+
+                                    });
+                                }
+                            }
+                        });
                     } else {}
                 });
             });
