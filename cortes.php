@@ -61,6 +61,7 @@ class Cortes
                         $totalCurp = 0;
                         $totalSusRet = 0;
                         $totalEdoInfo = 0;
+                        $total32D = 0;
                         $sum_total = 0;
                         $saldo = 0;
                         $mensaje_saldo = "";
@@ -89,6 +90,9 @@ class Cortes
                                 if ($informacionPedido !== null && isset($informacionPedido['EDO INFO']) && $informacionPedido['EDO INFO'] != "") {
                                     $totalEdoInfo += intval($informacionPedido['EDO INFO']);
                                 }
+                                if ($informacionPedido !== null && isset($informacionPedido['32D']) && $informacionPedido['32D'] != "") {
+                                    $total32D += intval($informacionPedido['32D']);
+                                }
                                 if ($informacionPedido !== null && $informacionPedido['TipoSaldo'] !== null && $informacionPedido['Saldo'] !== null) {
                                     $tipoSaldo = $informacionPedido['TipoSaldo'];
                                     $saldo = $informacionPedido['Saldo'];
@@ -116,6 +120,7 @@ class Cortes
                         $precio_total_curp = 0;
                         $precio_total_susret = 0;
                         $precio_total_edoinfo = 0;
+                        $precio_total_32D = 0;
                         foreach ($paquete as $key => $pqt) {
                             if ($pqt['srv_nombre'] == "ACTAS") {
                                 $precio_total_actas = $totalActas * $pqt['prc_precio'];
@@ -138,9 +143,12 @@ class Cortes
                             if ($pqt['srv_nombre'] == "EDO INFO") {
                                 $precio_total_edoinfo = $totalEdoInfo * $pqt['prc_precio'];
                             }
+                            if ($pqt['srv_nombre'] == "32D") {
+                                $precio_total_32D = $total32D * $pqt['prc_precio'];
+                            }
                         }
 
-                        $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo;
+                        $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo + $precio_total_32D;
                         $referencia = generarCodigoNumeros(6);
 
 
@@ -157,6 +165,7 @@ Total NSS: $totalNss = $$precio_total_nss
 Total CURP: $totalCurp = $$precio_total_curp 
 Total SUS/RET: $totalSusRet = $$precio_total_susret 
 Total EDO INFO: $totalEdoInfo = $$precio_total_edoinfo 
+Total 32D: $total32D = $$precio_total_32D 
 
 $mensaje_saldo
 
@@ -164,7 +173,7 @@ Total: $$sum_total
 
 Apóyenos en generar su pago antes de terminar el día. ¡Muchas gracias! 🎇"
                         );
-                        if ($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0) {
+                        if ($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0 && $total32D == 0) {
                             continue;
                         }
                         $response1 = Cortes::enviarMensaje($mensaje1);
