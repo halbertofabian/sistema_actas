@@ -796,6 +796,7 @@ class Controlador
                 $totalSusRet = 0;
                 $totalEdoInfo = 0;
                 $total32D = 0;
+                $totalALT15 = 0;
                 $sum_total = 0;
                 $saldo = 0;
                 $mensaje_saldo = "";
@@ -827,6 +828,9 @@ class Controlador
                         if ($informacionPedido !== null && isset($informacionPedido['32D']) && $informacionPedido['32D'] != "") {
                             $total32D += intval($informacionPedido['32D']);
                         }
+                        if ($informacionPedido !== null && isset($informacionPedido['ALT15']) && $informacionPedido['ALT15'] != "") {
+                            $totalALT15 += intval($informacionPedido['ALT15']);
+                        }
                         if ($informacionPedido !== null && $informacionPedido['TipoSaldo'] !== null && $informacionPedido['Saldo'] !== null) {
                             $tipoSaldo = $informacionPedido['TipoSaldo'];
                             $saldo = $informacionPedido['Saldo'];
@@ -855,6 +859,7 @@ class Controlador
                 $precio_total_susret = 0;
                 $precio_total_edoinfo = 0;
                 $precio_total_32D = 0;
+                $precio_total_ALT15 = 0;
                 foreach ($paquete as $key => $pqt) {
                     if ($pqt['srv_nombre'] == "ACTAS") {
                         $precio_total_actas = $totalActas * $pqt['prc_precio'];
@@ -880,9 +885,12 @@ class Controlador
                     if ($pqt['srv_nombre'] == "32D") {
                         $precio_total_32D = $total32D * $pqt['prc_precio'];
                     }
+                    if ($pqt['srv_nombre'] == "ALT15") {
+                        $precio_total_ALT15 = $totalALT15 * $pqt['prc_precio'];
+                    }
                 }
 
-                $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo + $precio_total_32D;
+                $sum_total += $precio_total_actas + $precio_total_rfc + $precio_total_cfe + $precio_total_nss + $precio_total_curp + $precio_total_susret + $precio_total_edoinfo + $precio_total_32D + $precio_total_ALT15;
                 $referencia = generarCodigoNumeros(6);
 
                 //                 $messageBody = "
@@ -921,6 +929,7 @@ Total CURP: $totalCurp = $$precio_total_curp
 Total SUS/RET: $totalSusRet = $$precio_total_susret 
 Total EDO INFO: $totalEdoInfo = $$precio_total_edoinfo 
 Total 32D: $total32D = $$precio_total_32D 
+Total ALT15: $totalALT15 = $$precio_total_ALT15 
 
 $mensaje_saldo
 
@@ -928,7 +937,7 @@ Total: $$sum_total
 
 Apóyenos en generar su pago antes de terminar el día. ¡Muchas gracias! 🎇"
                 );
-                if ($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0 && $total32D == 0) {
+                if ($totalActas == 0 && $totalRfc == 0 && $totalCfe == 0 && $totalNss == 0 && $totalCurp == 0 && $totalSusRet == 0 && $totalEdoInfo == 0 && $total32D == 0 && $totalALT15 == 0) {
                     return array('status' => true, 'mensaje' => 'No se envio mensaje a ' . $clt['clt_nombre'] . ' ya que no hay nada en conteo');
                 }
                 $response1 = Controlador::enviarMensaje($mensaje1);
